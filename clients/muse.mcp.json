@@ -1,0 +1,9 @@
+{
+  "mcp_servers": {
+    "engram": {
+      "enabled": true,
+      "transport": "stdio",
+      "command": "__ENGRAM_MCP_WRAPPER__"
+    }
+  }
+}

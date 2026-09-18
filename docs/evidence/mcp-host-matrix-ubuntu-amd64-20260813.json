@@ -1,0 +1,22 @@
+{
+  "catalogue_hosts": 16,
+  "combination_cells": 80,
+  "container_network": "disabled",
+  "disposition": "classified_not_promoted",
+  "executed_at": "2026-08-13T14:15:00+00:00",
+  "host_binaries_installed": [],
+  "image_id": "sha256:974bc2dacc6808b54e577c9a30bbdfc8ac4e95c8434a51703f0b21fefa2744d4",
+  "limitations": [
+    "The Ubuntu lane executed static adapter, MCP protocol, fail-closed, multi-project, and instruction-lifecycle cases.",
+    "No named coding-agent or GUI host binary was installed, so all host/provider cells remained blocked or ineligible.",
+    "A Linux container cannot certify a native desktop GUI or subscription-gated host."
+  ],
+  "platform": "ubuntu_24_04_amd64_container",
+  "required_scenarios": {
+    "passed": 8,
+    "total": 8
+  },
+  "runtime_support_claims": 0,
+  "schema_version": 1,
+  "synthetic_only": true
+}

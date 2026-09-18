@@ -1,0 +1,16 @@
+FROM ubuntu@sha256:561618e2c15bf2397621dd04f96926663a3b5616c189cf7e38db7e82f5c538ea
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq \
+    && apt-get install -y -qq --no-install-recommends \
+       ca-certificates \
+       git \
+       python3 \
+       python3-pip \
+       python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+
+LABEL org.opencontainers.image.title="NAOS Engram Ubuntu AMD64 test base" \
+      org.opencontainers.image.version="2026-08-13" \
+      org.opencontainers.image.description="Disposable synthetic acceptance base; contains no Engram memory data"

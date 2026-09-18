@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-08-17T21:44:09Z",
+  "executed_at": null,
+  "host": {
+    "outer_application": {
+      "name": "Antigravity",
+      "version": "2.3.1",
+      "sha256": "596a6c028d1a91c6e2306a2ec9ac0afe58bb68cf8d632bc29af90e956f1e110e"
+    },
+    "embedded_engine": {
+      "name": "Antigravity language server",
+      "version": "not_independently_reported",
+      "sha256": "49c961597501ed4c648adc5347ceef26bdb48b813305058393ab76b5233a0e21"
+    },
+    "execution_mode": "desktop_app_embedded_engine"
+  },
+  "platform": {
+    "os": "macos",
+    "os_version": "26.6.1",
+    "os_build": "25G76",
+    "architecture": "arm64"
+  },
+  "provider": {
+    "name": "Engram",
+    "version": "1.20.0",
+    "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+  },
+  "toolkit": {
+    "version": "0.1.0",
+    "source_commit_context": "db1e1b5cb2b7300e9052f3353bcbeae5ea8c19ed",
+    "source_tree_context": "3f223c74a9d1e847c300d905429ed7a1e9b04797",
+    "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+  },
+  "case": {
+    "target": "registered_canonical_project",
+    "workspace_kind": "synthetic_git_repository",
+    "workspace_clean_after_run": true,
+    "fixed_project_entry_present": true
+  },
+  "observations": {
+    "engram_mcp_server_exposed": true,
+    "mem_current_project_called": true,
+    "expected_project": "naos-engram-memories",
+    "returned_project": "naos-engram-memories",
+    "provider_source": "process_override",
+    "project_path_state": "empty",
+    "available_projects_state": "null",
+    "workspace_signal": "process_cwd",
+    "wrapper_resolution_source": "registered_explicit_project",
+    "incoming_project_signal": "present",
+    "wrapper_process_cwd_state": "filesystem_root",
+    "provider_probe": "not_run",
+    "other_memory_tools_called": false,
+    "memory_content_accessed": false
+  },
+  "post_response": {
+    "host_processes": 0,
+    "managed_wrapper_processes": 0,
+    "provider_processes": 0,
+    "database_holder_processes": 0,
+    "client_lease_entries": 0
+  },
+  "runtime_support_claim": false,
+  "disposition": "partial_real_host_evidence_not_promoted",
+  "claim_ceiling": "The exact Antigravity application and embedded language server completed one owner-assisted registered-project mem_current_project call through a fixed project entry. The MCP child used the filesystem root as its process cwd, so this does not establish workspace-derived resolution or general Antigravity support.",
+  "limitations": [
+    "The exact tool-call execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+    "The application MCP child used the filesystem root as its process cwd; the correct project came from the explicit project signal, not workspace-derived resolution.",
+    "The live language-server process received IDE override value 2.8.1, but that value is not treated as the language-server version; the bundled executable is bound by its exact hash.",
+    "No model-provider, account, subscription, or credential state was inspected or inferred.",
+    "No memory content was read or saved; memory read/write correctness was not tested.",
+    "Unregistered, missing-remote, explicit-mismatch, registry-collision, provider-unavailable, multi-project, clean-profile, credential-isolation, instruction-lifecycle, restart, and other-platform cases remain unrun.",
+    "A separate August 11 automated agy probe was already orphaned before this session and was terminated after the current app and CLI sessions exited cleanly; it is not attributed to this observation.",
+    "The post-quit probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+  ]
+}

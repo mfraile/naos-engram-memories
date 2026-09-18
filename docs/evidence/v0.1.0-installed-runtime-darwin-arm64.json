@@ -1,0 +1,29 @@
+{
+  "checks": {
+    "clone_free_wheel_install": "passed",
+    "durable_user_runtime": "passed",
+    "installed_asset_integrity": "passed",
+    "offline_wheel_build": "passed",
+    "unregistered_project_fails_closed": "passed",
+    "wrapper_current_project": "passed",
+    "wrapper_mcp_initialize": "passed",
+    "wrapper_tools_list": "passed"
+  },
+  "disposition": "runtime_validated_host_clients_not_promoted",
+  "engram_version": "engram 1.20.0",
+  "executed_at": "2026-08-13T14:42:50.517676+00:00",
+  "limitations": [
+    "This validates the provider and installed stdio wrapper, not a named GUI or coding-agent host.",
+    "No live memory database, real client configuration, cloud transport, or production project was used.",
+    "Network isolation was not enforced; the provider version probe may perform its own upstream release check."
+  ],
+  "platform": {
+    "architecture": "arm64",
+    "system": "Darwin"
+  },
+  "python": "3.12.7",
+  "schema_version": 1,
+  "synthetic_only": true,
+  "toolkit_version": "0.1.0",
+  "wheel_sha256": "171085819fcb4f90f214c22b31928c530674d7a2a231d6e5690571eed4d9b659"
+}

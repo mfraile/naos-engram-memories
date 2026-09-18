@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "matrix_version": "2026-08-18",
+  "claim_rule": "Only real_host or headless_extension_host evidence may support a host-runtime claim. mcp_protocol proves only transport/server behavior. static_schema proves only catalogue/template shape.",
+  "evidence_classes": {
+    "real_host": "The named released host binary or application spawned the managed wrapper in a disposable profile and completed the required MCP and project-identity cases.",
+    "headless_extension_host": "The named IDE extension ran in a disposable headless extension-host profile and completed the required MCP and project-identity cases; this is not evidence for the GUI shell.",
+    "mcp_protocol": "A synthetic MCP peer exercised wrapper startup, framing, tool discovery, and fail-closed cases without the named host.",
+    "static_schema": "Catalogue and adapter documents parsed and matched checked-in structural expectations; no process or MCP runtime was exercised."
+  },
+  "required_cases": [
+    "registered_project",
+    "unregistered_project",
+    "remote_mismatch",
+    "provider_unavailable",
+    "several_projects_isolated",
+    "instruction_install",
+    "instruction_idempotent",
+    "instruction_conflict_refused"
+  ],
+  "combination_policy": {
+    "rule": "Expand every eligible host across both platform lanes and every provider profile. Record blocked and ineligible cells; never silently drop GUI, subscription, version, architecture, or provider-unavailable combinations.",
+    "provider_profiles": [
+      {
+        "id": "synthetic_offline",
+        "purpose": "Deterministic wrapper/MCP protocol behavior only",
+        "runtime_claim_ceiling": "mcp_protocol"
+      },
+      {
+        "id": "provider_unavailable",
+        "purpose": "Mandatory fail-closed negative case",
+        "runtime_claim_ceiling": "mcp_protocol"
+      },
+      {
+        "id": "host_native_provider",
+        "purpose": "The host's approved real model/provider path, including subscription/account gates",
+        "runtime_claim_ceiling": "real_host"
+      },
+      {
+        "id": "openrouter_provider",
+        "purpose": "Provider combination under an already accepted MCP-capable host; OpenRouter is never the host",
+        "runtime_claim_ceiling": "real_host"
+      },
+      {
+        "id": "ollama_provider",
+        "purpose": "Local model-runtime combination under an already accepted MCP-capable host; Ollama is never the host",
+        "runtime_claim_ceiling": "real_host"
+      }
+    ]
+  },
+  "platforms": {
+    "darwin_arm64": {
+      "environment": "native macOS ARM64 disposable HOME/XDG profile",
+      "runtime_claim_ceiling": "real_host"
+    },
+    "ubuntu_24_04_amd64_container": {
+      "environment": "Ubuntu 24.04 AMD64 Docker image with synthetic mounted fixtures only",
+      "runtime_claim_ceiling": "headless_extension_host",
+      "limitation": "A container cannot certify a native desktop GUI host."
+    }
+  },
+  "hosts": [
+    {
+      "id": "codex",
+      "current_evidence_class": "mcp_protocol",
+      "acceptance_target": "real_host",
+      "cli_binary": "codex",
+      "safe_probe": [["--version"], ["mcp", "list"]],
+      "observed_real_host_case": "Three standalone CLI observations, the retained Desktop no-cwd rejection, and exact-version positive Desktop and VS Code extension project-config observations are retained without promotion. The newest CLI observation covers registered restart/recovery, unregistered and missing-remote startup refusal, unavailable-provider startup refusal, and sequential same-basename multi-project isolation. The project-config cases used explicit absolute cwd, required startup, and no fixed ENGRAM_PROJECT.",
+      "observation_refs": ["codex-cli-20260813", "codex-cli-0-145-0-dynamic-workspace-20260818", "codex-cli-0-145-0-reliability-20260818", "codex-desktop-26-810-52044-workspace-signal-negative-20260818", "codex-desktop-26-810-52044-project-config-current-project-20260818", "codex-vscode-1-133-0-extension-26-814-41407-current-project-20260818"],
+      "blocker": "The project-local Codex adapter is render-only and must be manually merged for each absolute workspace. The standalone CLI now has partial real-host negative, provider, sequential same-basename multi-project, and restart/recovery evidence. Full acceptance still lacks a named-host linked-worktree case, credential-canary isolation, instruction-following lifecycle evidence, the managed-adapter mismatch disposition, equivalent Desktop and IDE-extension negative/lifecycle cases, and other-platform evidence. Global fixed ENGRAM_PROJECT configuration remains refused.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host codex --platform darwin_arm64 --probe-local-hosts --output reports/mcp-hosts/codex-darwin-arm64.json",
+      "promotion_gate": "Complete the remaining mode-specific project-context contract without global ENGRAM_PROJECT by retaining a named-host linked-worktree result, credential-canary isolation, instruction-following lifecycle evidence, an explicit managed-adapter mismatch disposition, equivalent Desktop and IDE-extension negative/lifecycle cases, and the required other-platform case. Static parsing, inventory, synthetic wrapper results, or the current partial CLI reliability receipt are insufficient for promotion."
+    },
+    {
+      "id": "vscode-generic",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "headless_extension_host",
+      "cli_binary": "code",
+      "safe_probe": [["--version"], ["--list-extensions"]],
+      "blocker": "The Copilot/Agent Host extension has not run the MCP cases in a disposable VS Code extension-host profile.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host vscode-generic --platform ubuntu_24_04_amd64_container --probe-local-hosts --output reports/mcp-hosts/vscode-generic-ubuntu24-amd64.json",
+      "promotion_gate": "Use an approved extension already present in the disposable image/profile and retain extension-host MCP identity evidence for every required case; code --list-extensions and JSON validation are inventory only."
+    },
+    {
+      "id": "codex-vscode",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "ineligible",
+      "cli_binary": null,
+      "safe_probe": [],
+      "blocker": "This is a non-independent alias; Codex IDE and CLI share the codex configuration surface.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host codex --platform darwin_arm64 --probe-local-hosts --output reports/mcp-hosts/codex-darwin-arm64.json",
+      "promotion_gate": "Never promote codex-vscode independently; promote the codex entry or test vscode-generic as a different host."
+    },
+    {
+      "id": "claude-code",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "real_host",
+      "cli_binary": "claude",
+      "safe_probe": [["--version"], ["mcp", "list"]],
+      "observed_real_host_case": "Append-only exact-version standalone and desktop-app-embedded observations are retained without promotion in config/mcp-host-observations.v1.json.",
+      "observation_refs": [
+        "claude-code-standalone-cli-20260813",
+        "claude-code-desktop-app-embedded-20260817",
+        "claude-code-desktop-app-embedded-unregistered-20260817"
+      ],
+      "blocker": "Retained Claude Code observations cover positive registered-project cases plus one desktop host-surface-unavailable diagnostic in an unregistered fixture. That diagnostic did not retain wrapper invocation or resolver-refusal provenance, so the unregistered-project acceptance case, other negative cases, clean-profile isolation, credential isolation, multi-project, instruction, and Ubuntu cases remain incomplete.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host claude-code --platform darwin_arm64 --probe-local-hosts --output reports/mcp-hosts/claude-code-darwin-arm64.json",
+      "promotion_gate": "Run the released Claude Code host with CLAUDE_PROJECT_DIR supplied by the disposable project and retain all required identity/failure cases; a CLI version probe is not runtime acceptance."
+    },
+    {
+      "id": "opencode-v1",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "real_host",
+      "cli_binary": "opencode",
+      "safe_probe": [["--version"]],
+      "observed_real_host_case": "Append-only exact-version OpenCode observations retain isolated startup/tool discovery and one user-assisted registered-project mem_current_project result without promotion in config/mcp-host-observations.v1.json.",
+      "observation_refs": ["opencode-v1-startup-20260817", "opencode-v1-current-project-20260817"],
+      "blocker": "The retained OpenCode observations do not exercise the required unregistered, missing-remote, mismatch, registry-collision, multi-project, provider-unavailable, instruction-lifecycle, restart, and remaining isolation cases, and no Ubuntu real-host case exists.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host opencode-v1 --platform ubuntu_24_04_amd64_container --probe-local-hosts --output reports/mcp-hosts/opencode-v1-ubuntu24-amd64.json",
+      "promotion_gate": "The stable opencode host must retain every required identity, failure, isolation, instruction-lifecycle, and restart case for the intended workspace; one registered-project call or startup/tool discovery cannot satisfy this gate."
+    },
+    {
+      "id": "cursor",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "headless_extension_host",
+      "cli_binary": "cursor",
+      "safe_probe": [["--version"], ["--list-extensions"]],
+      "observation_refs": ["cursor-desktop-app-3-16-17-current-project-20260817"],
+      "observed_real_host_case": "An append-only exact-version Cursor desktop-app and embedded-MCP-extension observation retains one owner-assisted registered-project mem_current_project result without promotion in config/mcp-host-observations.v1.json.",
+      "blocker": "The retained Cursor observation proves one fixed registered-project call after explicit owner enablement, but the required unregistered, missing-remote, mismatch, registry-collision, multi-project, provider-unavailable, isolation, instruction-lifecycle, restart, and other-platform cases remain incomplete.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host cursor --platform darwin_arm64 --probe-local-hosts --output reports/mcp-hosts/cursor-darwin-arm64.json",
+      "promotion_gate": "Retain the project MCP run from an approved disposable Cursor profile for every required case; CLI presence or schema validation cannot promote runtime support."
+    },
+    {
+      "id": "antigravity",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "headless_extension_host",
+      "cli_binary": "agy",
+      "safe_probe": [["--version"]],
+      "observation_refs": [
+        "antigravity-cli-1-1-13-current-project-20260817",
+        "antigravity-desktop-app-2-3-1-current-project-20260817"
+      ],
+      "observed_real_host_case": "Append-only exact-version Antigravity CLI and desktop-app observations retain one owner-assisted fixed-project mem_current_project result per execution mode without promotion; the app MCP child used the filesystem root as its process cwd.",
+      "blocker": "The retained Antigravity observations prove one fixed registered-project call in each of the CLI and desktop-app modes, but the required unregistered, missing-remote, mismatch, registry-collision, multi-project, provider-unavailable, isolation, instruction-lifecycle, restart, account-boundary, and other-platform cases remain incomplete.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host antigravity --platform darwin_arm64 --probe-local-hosts --output reports/mcp-hosts/antigravity-darwin-arm64.json",
+      "promotion_gate": "An authorized account and approved disposable profile must run every required MCP identity/failure case without copying a live profile; binary/version inventory alone is insufficient."
+    },
+    {
+      "id": "kilo",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "headless_extension_host",
+      "cli_binary": "kilo",
+      "safe_probe": [["--version"]],
+      "observation_refs": [
+        "kilo-code-vscode-extension-7-4-22-current-project-20260817"
+      ],
+      "observed_real_host_case": "An append-only exact-version Visual Studio Code and Kilo Code extension observation retains one owner-assisted fixed-project mem_current_project result and one clean quit without promotion.",
+      "blocker": "The retained Kilo Code observation proves one fixed registered-project call and one clean quit, but comment-bearing JSONC and the required unregistered, missing-remote, mismatch, registry-collision, multi-project, provider-unavailable, isolation, instruction-lifecycle, restart, and other-platform cases remain incomplete.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host kilo --platform ubuntu_24_04_amd64_container --probe-local-hosts --output reports/mcp-hosts/kilo-ubuntu24-amd64.json",
+      "promotion_gate": "Run an approved Kilo extension in a disposable profile against strict-JSON and pre-existing JSONC fixtures, retaining every required MCP identity/failure case and non-destructive merge evidence."
+    },
+    {
+      "id": "muse",
+      "current_evidence_class": "mcp_protocol",
+      "acceptance_target": "real_host",
+      "cli_binary": "muse",
+      "safe_probe": [["--version"]],
+      "observed_real_host_case": "An append-only exact-version Muse observation retains one user-assisted registered-project mem_current_project result and the failed automatic clean-quit evidence without promotion in config/mcp-host-observations.v1.json.",
+      "observation_refs": ["muse-current-project-20260817"],
+      "blocker": "The retained Muse observation proves one registered-project call, but automatic clean quit left a stale client lease and the required unregistered, mismatch, multi-project, provider-unavailable, isolation, instruction-lifecycle, restart, and other-platform cases remain incomplete.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host muse --platform darwin_arm64 --probe-local-hosts --output reports/mcp-hosts/muse-darwin-arm64.json",
+      "promotion_gate": "Retain every required identity, failure, isolation, instruction-lifecycle, restart, and automatic clean-quit case from a disposable Muse profile; one registered-project call cannot satisfy this gate."
+    },
+    {
+      "id": "grok-cli",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "real_host",
+      "cli_binary": "grok",
+      "safe_probe": [["--version"]],
+      "blocker": "The exact Grok CLI product/version and local MCP configuration contract are unverified; no Windows executable was found on PATH.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host grok-cli --platform windows_amd64 --probe-local-hosts --output reports/mcp-hosts/grok-cli-windows-amd64.json",
+      "promotion_gate": "Identify the released Grok CLI and its official local stdio MCP surface, then retain every required registered, negative, isolation, instruction, restart, and provider case before installing an adapter."
+    },
+    {
+      "id": "grok-bot",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "ineligible",
+      "cli_binary": null,
+      "safe_probe": [],
+      "blocker": "Grok Bot is a chat/model surface, not a verified local MCP client host.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host grok-bot --platform windows_amd64 --output reports/mcp-hosts/grok-bot-role-blocked.json",
+      "promotion_gate": "Do not promote Grok Bot as an Engram host; configure Engram in the underlying MCP-capable coding agent and evaluate Grok only as a provider combination."
+    },
+    {
+      "id": "lm-studio",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "real_host",
+      "cli_binary": null,
+      "safe_probe": [],
+      "blocker": "LM Studio is GUI-only for this contract; no safe project-scoping or disposable-profile runtime evidence exists.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host lm-studio --platform darwin_arm64 --output reports/mcp-hosts/lm-studio-darwin-arm64-blocked.json",
+      "promotion_gate": "An operator must use a fresh application profile with no imported live settings, configure the synthetic wrapper, and retain all required real-host cases; the runner intentionally records blocked until that external evidence exists."
+    },
+    {
+      "id": "anythingllm",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "real_host",
+      "cli_binary": null,
+      "safe_probe": [],
+      "blocker": "AnythingLLM is GUI/workspace managed and no disposable workspace/runtime identity evidence exists.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host anythingllm --platform darwin_arm64 --output reports/mcp-hosts/anythingllm-darwin-arm64-blocked.json",
+      "promotion_gate": "Use a new synthetic AnythingLLM workspace and profile, without imported credentials or settings, and retain every required real-host case before changing the support tier."
+    },
+    {
+      "id": "open-webui",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "ineligible",
+      "cli_binary": null,
+      "safe_probe": [],
+      "blocker": "The host requires native HTTP MCP while the toolkit exposes local stdio; no approved bridge is in scope.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host open-webui --platform ubuntu_24_04_amd64_container --output reports/mcp-hosts/open-webui-transport-blocked.json",
+      "promotion_gate": "A separately governed stdio-to-HTTP bridge, threat model, authentication policy, and full HTTP MCP acceptance suite must be approved first; do not promote the current adapter."
+    },
+    {
+      "id": "openrouter",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "ineligible",
+      "cli_binary": null,
+      "safe_probe": [],
+      "blocker": "OpenRouter is a model provider, not a process that hosts the local Engram MCP server; subscription/provider availability cannot change that role.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host openrouter --platform darwin_arm64 --output reports/mcp-hosts/openrouter-role-blocked.json",
+      "promotion_gate": "Never promote OpenRouter as a host; select and test the actual MCP-capable coding agent, then test OpenRouter only as a provider combination in that host's separate provider matrix."
+    },
+    {
+      "id": "ollama",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "ineligible",
+      "cli_binary": "ollama",
+      "safe_probe": [["--version"]],
+      "blocker": "Ollama is a local model runtime, not the MCP client host; binary availability is not Engram hosting support.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host ollama --platform darwin_arm64 --probe-local-hosts --output reports/mcp-hosts/ollama-role-blocked.json",
+      "promotion_gate": "Never promote Ollama as an Engram host; record it only as a provider/runtime combination under a separately accepted MCP-capable host."
+    },
+    {
+      "id": "open-design",
+      "current_evidence_class": "static_schema",
+      "acceptance_target": "ineligible",
+      "cli_binary": null,
+      "safe_probe": [],
+      "blocker": "Open Design is another MCP server and cannot host the Engram MCP server.",
+      "promotion_command": "python3 tools/run_mcp_host_acceptance.py --host open-design --platform darwin_arm64 --output reports/mcp-hosts/open-design-role-blocked.json",
+      "promotion_gate": "Never promote Open Design as a host; configure both servers in and test the actual underlying coding-agent host."
+    }
+  ]
+}

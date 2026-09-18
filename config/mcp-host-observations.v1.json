@@ -1,0 +1,1510 @@
+{
+  "$schema": "schemas/mcp-host-observations.v1.schema.json",
+  "schema_version": 1,
+  "register_version": "2026-08-18",
+  "claim_rule": "Each observation applies only to its exact host layers, execution mode, platform, provider, toolkit context, checks, and limitations. A version change neither proves incompatibility nor inherits prior runtime evidence; stable host support remains behavior-gated.",
+  "observations": [
+    {
+      "id": "codex-cli-20260813",
+      "host_id": "codex",
+      "execution_mode": "standalone_cli",
+      "recorded_at": "2026-08-13T14:06:42.897794+00:00",
+      "executed_at": "2026-08-13T14:06:42.897794+00:00",
+      "platform": {
+        "os": "macos",
+        "os_version": null,
+        "os_build": null,
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "standalone_engine",
+          "name": "Codex CLI",
+          "version": "0.145.0",
+          "sha256": null
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": null
+      },
+      "toolkit": {
+        "version": null,
+        "source_commit_context": null,
+        "source_tree_context": null,
+        "installed_wrapper_sha256": null
+      },
+      "project_resolution": {
+        "expected_project": "example-product",
+        "returned_project": "example-product",
+        "provider_source": "not_retained",
+        "project_path_state": "not_retained",
+        "incoming_project_signal": "not_retained",
+        "workspace_signal": "not_retained",
+        "wrapper_resolution_source": "not_retained",
+        "workspace_kind": "synthetic_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "not_retained",
+        "wrapper_resolution_provenance": "not_retained",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "failed",
+        "credential_isolation": "not_retained",
+        "restart_persistence": "not_retained"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "not_retained",
+          "method": "The historical receipt did not retain a post-quit runtime-process probe.",
+          "observed_count": null
+        },
+        "database_holders": {
+          "status": "not_retained",
+          "method": "The historical receipt did not retain a post-quit database-holder probe.",
+          "observed_count": null
+        },
+        "client_leases": {
+          "status": "not_retained",
+          "method": "The historical receipt did not retain a post-quit client-lease probe.",
+          "observed_count": null
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "Only the registered-project case ran through the named standalone host; the remaining real-host negative cases are still required.",
+        "The process was ephemeral and read-only, but used the operator's existing Codex authentication.",
+        "The historical evidence does not certify the Codex desktop application, IDE shell, another operating system, or another version.",
+        "The historical receipt did not retain a dynamic repository-context contract."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/codex-0.145.0-darwin-arm64.json",
+          "sha256": "c73cc00f02f633989a80179019d05d9211c3bf1481fe78ca793853770bd4dbf8"
+        }
+      ]
+    },
+    {
+      "id": "codex-cli-0-145-0-dynamic-workspace-20260818",
+      "host_id": "codex",
+      "execution_mode": "standalone_cli",
+      "recorded_at": "2026-08-17T23:36:11+00:00",
+      "executed_at": "2026-08-17T23:31:20+00:00",
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "standalone_engine",
+          "name": "Codex CLI",
+          "version": "0.145.0",
+          "sha256": "1da3f4e0e96028b8a771814293c3033dafd1971f943f6c7e79b0897fe705f590"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "0b12e42019218694fa792490f33525e497b26822",
+        "source_tree_context": "d77abf9a67beb850be22e49f35903bebd6df0394",
+        "installed_wrapper_sha256": "d4c9b67e21bf64b70c39efc74eda6e5de86ff5371d522d9cc272673627797bf4"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": "naos-engram-memories",
+        "provider_source": "process_override",
+        "project_path_state": "empty",
+        "incoming_project_signal": "absent",
+        "workspace_signal": "process_cwd",
+        "wrapper_resolution_source": "approved_git_remote",
+        "workspace_kind": "synthetic_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "passed",
+        "wrapper_resolution_provenance": "passed",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "passed",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "passed",
+          "method": "Post-response process inspection found no process belonging to the disposable Codex fixture, managed wrapper, or adopted Engram provider.",
+          "observed_count": 0
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "Post-response lsof inspection found no holder of either the disposable or production Engram database files.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "passed",
+          "method": "Post-response inspection found no entry in the disposable provider-client lease directory.",
+          "observed_count": 0
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "This observation proves one positive standalone-CLI signal case only; Codex remains manual and unconfigured.",
+        "The wrapper's transient process exited before the operating-system cwd probe returned a path. Workspace provenance combines the Codex workdir, provider-returned cwd, exact wrapper source and hash, and pre-run resolver proof.",
+        "No explicit credential canaries were injected, so the complete credential-isolation case remains unrun.",
+        "The required negative, nested, linked-worktree, same-basename, multi-project, restart, instruction-lifecycle, Desktop, and other-platform cases remain unrun.",
+        "No memory content was read or saved; memory read and write correctness were not tested.",
+        "The PATH-alias warning affected refused helper creation under the disposable temporary Codex home, not execution of the exact absolute CLI binary."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/codex-0.145.0-darwin-arm64-dynamic-workspace-current-project-20260818.json",
+          "sha256": "b40259018ed4417709adaea9f00a2f74ba8e43e89c4dbaec6a37ebbf87222c10"
+        }
+      ]
+    },
+    {
+      "id": "codex-cli-0-145-0-reliability-20260818",
+      "host_id": "codex",
+      "execution_mode": "standalone_cli",
+      "recorded_at": "2026-08-18T09:12:12+00:00",
+      "executed_at": "2026-08-18T09:05:52+00:00",
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "standalone_engine",
+          "name": "Codex CLI",
+          "version": "0.145.0",
+          "sha256": "1da3f4e0e96028b8a771814293c3033dafd1971f943f6c7e79b0897fe705f590"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "27eaa74d37d24e69ce4a1d009ae074da80de69ab",
+        "source_tree_context": "e6d413640d0457cbc48bbcfadd8d31df39e92d62",
+        "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": "naos-engram-memories",
+        "provider_source": "process_override",
+        "project_path_state": "empty",
+        "incoming_project_signal": "absent",
+        "workspace_signal": "process_cwd",
+        "wrapper_resolution_source": "approved_git_remote",
+        "workspace_kind": "synthetic_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "passed",
+        "wrapper_resolution_provenance": "passed",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "passed",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "passed",
+        "several_projects_isolated": "passed",
+        "clean_profile_isolation": "not_run",
+        "credential_isolation": "not_run",
+        "restart_persistence": "passed"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "passed",
+          "method": "Post-run process inspection found no Codex fixture, managed wrapper, or adopted Engram provider process.",
+          "observed_count": 0
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "Post-run lsof inspection found no holder of the production Engram database files.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "passed",
+          "method": "Post-run inspection found no entry in the managed provider-client lease directory.",
+          "observed_count": 0
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "The unregistered, missing-remote, and unavailable-provider host failures were observed as required MCP initialization failures. Codex did not retain the wrapper exit code; the shared deterministic suite separately passed the exact exit-64 and exit-127 contracts.",
+        "The sequential multi-project case used two repositories with the same leaf directory name and distinct approved remotes. The discarded concurrent three-server diagnostic is not acceptance evidence.",
+        "The linked-worktree case completed through the managed wrapper and real provider without the Codex host; linked-worktree host behavior therefore remains partial.",
+        "The shipped Codex adapter has no fixed project argument or environment, so its explicit-project/remote mismatch branch is not reachable as a managed Codex-host case. The mismatch refusal remains deterministic wrapper evidence.",
+        "The run used existing Codex authentication while ignoring user configuration. It did not establish a fresh-authentication profile or inject explicit credential canaries.",
+        "No memory content was read or saved. Desktop, IDE-extension, instruction-following, other-platform, crash, and force-quit behavior remain outside this observation."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/codex-0.145.0-darwin-arm64-reliability-20260818.json",
+          "sha256": "b64a0e1952ffd62f2ea3982f8d97498ca3c0e9ebf0146ddcf9e0340649d672ca"
+        }
+      ]
+    },
+    {
+      "id": "claude-code-standalone-cli-20260813",
+      "host_id": "claude-code",
+      "execution_mode": "standalone_cli",
+      "recorded_at": "2026-08-13T14:09:48.812000+00:00",
+      "executed_at": "2026-08-13T14:09:48.812000+00:00",
+      "platform": {
+        "os": "macos",
+        "os_version": null,
+        "os_build": null,
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "standalone_engine",
+          "name": "Claude Code",
+          "version": "2.1.227",
+          "sha256": null
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": null
+      },
+      "toolkit": {
+        "version": null,
+        "source_commit_context": null,
+        "source_tree_context": null,
+        "installed_wrapper_sha256": null
+      },
+      "project_resolution": {
+        "expected_project": "example-product",
+        "returned_project": "example-product",
+        "provider_source": "not_retained",
+        "project_path_state": "not_retained",
+        "incoming_project_signal": "not_retained",
+        "workspace_signal": "not_retained",
+        "wrapper_resolution_source": "not_retained",
+        "workspace_kind": "synthetic_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "not_retained",
+        "wrapper_resolution_provenance": "not_retained",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "failed",
+        "credential_isolation": "not_retained",
+        "restart_persistence": "not_retained"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "not_retained",
+          "method": "The historical receipt did not retain a post-quit runtime-process probe.",
+          "observed_count": null
+        },
+        "database_holders": {
+          "status": "not_retained",
+          "method": "The historical receipt did not retain a post-quit database-holder probe.",
+          "observed_count": null
+        },
+        "client_leases": {
+          "status": "not_retained",
+          "method": "The historical receipt did not retain a post-quit client-lease probe.",
+          "observed_count": null
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "Only the registered dynamic-project case ran through the named standalone host; the remaining real-host negative cases are still required.",
+        "Strict MCP configuration and no session persistence were used, but the process loaded the operator's existing authentication, hooks, and plugins.",
+        "The historical evidence does not certify the Claude desktop app, an IDE extension shell, another operating system, or another version.",
+        "The historical receipt did not retain wrapper workspace-signal or resolution-source provenance."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/claude-code-2.1.227-darwin-arm64.json",
+          "sha256": "6d744e277d5a24a23f81380cf5f44f7ed80b4c590b983db2bfa819ddc39b5309"
+        }
+      ]
+    },
+    {
+      "id": "opencode-v1-startup-20260817",
+      "host_id": "opencode-v1",
+      "execution_mode": "standalone_cli",
+      "recorded_at": "2026-08-17T10:59:20.060585+00:00",
+      "executed_at": null,
+      "platform": {
+        "os": "macos",
+        "os_version": null,
+        "os_build": null,
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "standalone_engine",
+          "name": "OpenCode",
+          "version": "1.18.18",
+          "sha256": "4f5979c2dadb06fbff1335335afaaea274e58f92e79aa43cf2ed98618d555422"
+        }
+      ],
+      "provider": {
+        "name": "Synthetic Engram stdio peer",
+        "version": null,
+        "sha256": null
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "9a5b7a96047d27380f8c6e154dea4ef2adc6257f",
+        "source_tree_context": "9016fc15a48a571b0dc30e756ca0bff8b8d146d0",
+        "installed_wrapper_sha256": null
+      },
+      "project_resolution": {
+        "expected_project": "example-product",
+        "returned_project": null,
+        "provider_source": "not_retained",
+        "project_path_state": "not_retained",
+        "incoming_project_signal": "not_retained",
+        "workspace_signal": "not_retained",
+        "wrapper_resolution_source": "not_retained",
+        "workspace_kind": "synthetic_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "not_performed",
+        "registered_canonical_project": "not_performed",
+        "workspace_signal_provenance": "not_retained",
+        "wrapper_resolution_provenance": "not_retained",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "passed",
+        "credential_isolation": "passed",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "not_retained",
+          "method": "The startup receipt did not retain a post-exit host, wrapper, or provider process probe.",
+          "observed_count": null
+        },
+        "database_holders": {
+          "status": "not_retained",
+          "method": "The synthetic provider used no production Engram database; no holder probe was retained.",
+          "observed_count": null
+        },
+        "client_leases": {
+          "status": "not_retained",
+          "method": "The startup receipt did not retain a post-exit client-lease probe.",
+          "observed_count": null
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "OpenCode completed startup, MCP initialize, and tools/list only; mem_current_project was listed but not called.",
+        "The provider and project registry were synthetic, no model provider was invoked, and production memory was not accessed.",
+        "The receipt generation timestamp was retained, but the exact execution timestamp and post-exit lifecycle probes were not.",
+        "This observation applies only to the exact pinned OpenCode binary, Darwin ARM64 platform, source identity, and synthetic fixture."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/opencode-1.18.18-darwin-arm64-startup.json",
+          "sha256": "4c50da487ff2618f8cd5ca9ffd97eb250bcb68cc1d3b05f005602f7e16d22ebd"
+        }
+      ]
+    },
+    {
+      "id": "opencode-v1-current-project-20260817",
+      "host_id": "opencode-v1",
+      "execution_mode": "standalone_cli",
+      "recorded_at": "2026-08-17T17:51:00Z",
+      "executed_at": null,
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "standalone_engine",
+          "name": "OpenCode",
+          "version": "1.18.18",
+          "sha256": "4f5979c2dadb06fbff1335335afaaea274e58f92e79aa43cf2ed98618d555422"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "c935f9e12cebe982c11e6b785d320b1809c2b4ba",
+        "source_tree_context": "ff102898433ccddc339986f8d4e907732f7f5c2a",
+        "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": "naos-engram-memories",
+        "provider_source": "process_override",
+        "project_path_state": "empty",
+        "incoming_project_signal": "present",
+        "workspace_signal": "not_retained",
+        "wrapper_resolution_source": "not_retained",
+        "workspace_kind": "generated_git_worktree"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "not_retained",
+        "wrapper_resolution_provenance": "not_retained",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "not_run",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "passed",
+          "method": "Exact process-name and process-command inspection for OpenCode, the managed wrapper, and the Engram provider after the operator fully quit OpenCode.",
+          "observed_count": 0
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "lsof against the Engram database, WAL, and SHM after the operator fully quit OpenCode.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "passed",
+          "method": "Direct enumeration of the managed provider client-lease directory after clean quit.",
+          "observed_count": 0
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "This is one user-assisted mem_current_project result from the exact pinned OpenCode V1 binary and one generated registered worktree, not broad OpenCode support.",
+        "The exact execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+        "OpenCode displayed the model label Big Pickle, but the LLM provider, account, and credential path were not retained or inferred; this observation establishes only the MCP tool result.",
+        "The project-local configuration supplied the expected project explicitly, but the wrapper's workspace signal and resolution-source log were not retained.",
+        "No memory content was read or saved; memory read/write correctness was not tested.",
+        "The generated worktree remained unchanged, its opencode.json remained ignored, and no provider-maintenance lock existed after clean quit.",
+        "Unregistered, missing-remote, explicit-mismatch, registry-collision, provider-unavailable, multi-project, clean-profile, credential-isolation, instruction-lifecycle, restart, and Ubuntu cases remain unrun.",
+        "The clean-quit probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+      ],
+      "source_refs": []
+    },
+    {
+      "id": "claude-code-desktop-app-embedded-20260817",
+      "host_id": "claude-code",
+      "execution_mode": "desktop_app_embedded_engine",
+      "recorded_at": "2026-08-17T13:45:49Z",
+      "executed_at": null,
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "outer_application",
+          "name": "Claude desktop app",
+          "version": "1.30096.5",
+          "sha256": "fbca82e3c0602dc167b6798e895c96f2ba49b1c701b4e1891e0b8324b8d2fd6e"
+        },
+        {
+          "role": "embedded_engine",
+          "name": "Claude Code",
+          "version": "2.1.229",
+          "sha256": "92678218823353283cf8d04038b9122c1a63e6d83ad2a6ba87897334204e6493"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "17309a40872ec7f131e2f08a6ef93cb0bd94f57c",
+        "source_tree_context": "383558ce945adfe0a10aa06be6190758eec53d88",
+        "installed_wrapper_sha256": "8adb3358a776b49f32534c00defdc084a2d6bced2c3f13be00a87e51672e0320"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": "naos-engram-memories",
+        "provider_source": "process_override",
+        "project_path_state": "empty",
+        "incoming_project_signal": "not_retained",
+        "workspace_signal": "not_retained",
+        "wrapper_resolution_source": "not_retained",
+        "workspace_kind": "generated_git_worktree"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "not_retained",
+        "wrapper_resolution_provenance": "not_retained",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "not_run",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "passed",
+          "method": "Exact process-command inspection for Claude.app, embedded Claude Code, the managed wrapper, and the Engram provider after the operator fully quit Claude.app.",
+          "observed_count": 0
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "lsof against the Engram database, WAL, and SHM after the operator fully quit Claude.app.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "passed",
+          "method": "Direct enumeration of the managed provider client-lease directory after clean quit.",
+          "observed_count": 0
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "This is one user-assisted mem_current_project result from the Claude desktop app's embedded Claude Code engine, not standalone Claude Code CLI evidence or broad Claude chat/work support.",
+        "The exact execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+        "The current wrapper did not retain whether it selected CLAUDE_PROJECT_DIR or process cwd, nor whether the resolver used the approved Git remote or an incoming explicit project signal.",
+        "No memory content was read or saved; memory read/write correctness was not tested.",
+        "Unregistered, remote-mismatch, provider-unavailable, multi-project, clean-profile, credential-isolation, and other-platform cases remain unrun.",
+        "No post-restart behavior check was retained; restart persistence remains untested.",
+        "The clean-quit probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+      ],
+      "source_refs": []
+    },
+    {
+      "id": "claude-code-desktop-app-embedded-unregistered-20260817",
+      "host_id": "claude-code",
+      "execution_mode": "desktop_app_embedded_engine",
+      "recorded_at": "2026-08-17T16:47:32Z",
+      "executed_at": null,
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "outer_application",
+          "name": "Claude desktop app",
+          "version": "1.30096.5",
+          "sha256": "fbca82e3c0602dc167b6798e895c96f2ba49b1c701b4e1891e0b8324b8d2fd6e"
+        },
+        {
+          "role": "embedded_engine",
+          "name": "Claude Code",
+          "version": "2.1.229",
+          "sha256": "92678218823353283cf8d04038b9122c1a63e6d83ad2a6ba87897334204e6493"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": null,
+        "sha256": null
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "87eafa95537b15b834f7c8db1e73a88e4eed86bf",
+        "source_tree_context": "d9dac15d4e018f633e126cf735bd2334c4f9be55",
+        "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+      },
+      "project_resolution": {
+        "expected_project": null,
+        "returned_project": null,
+        "provider_source": "not_retained",
+        "project_path_state": "not_retained",
+        "incoming_project_signal": "not_retained",
+        "workspace_signal": "not_retained",
+        "wrapper_resolution_source": "not_retained",
+        "workspace_kind": "synthetic_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "failed",
+        "mem_current_project": "not_performed",
+        "registered_canonical_project": "not_performed",
+        "workspace_signal_provenance": "not_retained",
+        "wrapper_resolution_provenance": "not_retained",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "not_run",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "passed",
+          "method": "Exact process-command inspection for Claude.app, embedded Claude Code, the managed and legacy wrappers, and the Engram provider after the operator fully quit Claude.app.",
+          "observed_count": 0
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "lsof against the Engram database, WAL, and SHM after the operator fully quit Claude.app.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "passed",
+          "method": "Direct enumeration of the managed provider client-lease directory after clean quit.",
+          "observed_count": 0
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "The Claude desktop app selected the sanitized unregistered Git fixture and exposed no Engram MCP server or memory tool.",
+        "Normal host logging did not retain wrapper invocation or the resolver exit reason, so this observation does not satisfy the unregistered-project acceptance case.",
+        "No Engram memory or provider tool was called, and no memory content was read or saved.",
+        "The exact tool-call execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+        "The clean-quit probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/claude-code-desktop-app-embedded-unregistered-20260817.json",
+          "sha256": "82bfab3b6cdfe6dae964c7c003a34d0445cd66c998c15f4642cccc587be9a0dd"
+        }
+      ]
+    },
+    {
+      "id": "muse-current-project-20260817",
+      "host_id": "muse",
+      "execution_mode": "standalone_cli",
+      "recorded_at": "2026-08-17T18:32:44Z",
+      "executed_at": null,
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "standalone_engine",
+          "name": "Muse Code",
+          "version": "0.1.0-R708.1",
+          "sha256": "4290bfafa5bbb81a6fd493aaea12f848c789b1d22edfa0c4b849151deba3e70c"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "e43cdaaa38e3491babc0ee24ca029cf1e14710d1",
+        "source_tree_context": "f1a03407dd48e1abd7b1ec53b0f7244c2255b6af",
+        "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": "naos-engram-memories",
+        "provider_source": "process_override",
+        "project_path_state": "empty",
+        "incoming_project_signal": "not_retained",
+        "workspace_signal": "not_retained",
+        "wrapper_resolution_source": "not_retained",
+        "workspace_kind": "generated_git_worktree"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "not_retained",
+        "wrapper_resolution_provenance": "not_retained",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "not_run",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "failed",
+          "method": "Post-quit process inspection found five pre-existing Muse probe processes started on 2026-08-11; they were not spawned by this observation, but the required zero-process clean environment was not present until exact manual cleanup.",
+          "observed_count": 5
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "lsof against the Engram database, WAL, and SHM after the operator fully quit Muse.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "failed",
+          "method": "Direct enumeration after quit found one empty managed client lease for the terminated Muse wrapper PID; exact manual removal was required.",
+          "observed_count": 1
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "This is one user-assisted mem_current_project result from the exact pinned Muse Code binary and one generated registered worktree, not broad Muse support.",
+        "The exact execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+        "The host model provider, Meta account, browser session, and credential path were not inspected or inferred; this observation establishes only the MCP tool result.",
+        "The wrapper did not retain its incoming workspace signal or resolution source, so provider_source=process_override does not prove how the wrapper selected the registered project.",
+        "No memory content was read or saved; memory read/write correctness was not tested.",
+        "Five pre-existing August 11 Muse probes contaminated the first process-count check and were later terminated with SIGTERM; they are not attributed to this session.",
+        "The current session left one empty stale client lease and therefore failed automatic clean quit; exact dead-PID lease cleanup later restored zero Muse/Engram processes, database holders, leases, and maintenance locks.",
+        "Unregistered, missing-remote, explicit-mismatch, registry-collision, provider-unavailable, multi-project, clean-profile, credential-isolation, instruction-lifecycle, restart, and other-platform cases remain unrun."
+      ],
+      "source_refs": []
+    },
+    {
+      "id": "cursor-desktop-app-3-16-17-current-project-20260817",
+      "host_id": "cursor",
+      "execution_mode": "desktop_app_embedded_engine",
+      "recorded_at": "2026-08-17T20:00:17Z",
+      "executed_at": null,
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "outer_application",
+          "name": "Cursor",
+          "version": "3.16.17",
+          "sha256": "2f66191d6b2332772997081f93c217cb2a623511dc0f19bd458ec43f49490078"
+        },
+        {
+          "role": "embedded_engine",
+          "name": "Cursor MCP extension",
+          "version": "0.0.1",
+          "sha256": "04b40a1de2ce5c93a74cb2f236747494def0476f6f91da7ad223ff43f71acd82"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "9b2bd99f948dbdf8eab38280c45fcb4e7c84ba23",
+        "source_tree_context": "2e9e0a2f785a70707450551678653d7f4c71ed27",
+        "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": "naos-engram-memories",
+        "provider_source": "process_override",
+        "project_path_state": "empty",
+        "incoming_project_signal": "present",
+        "workspace_signal": "process_cwd",
+        "wrapper_resolution_source": "registered_explicit_project",
+        "workspace_kind": "generated_git_worktree"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "passed",
+        "wrapper_resolution_provenance": "passed",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "not_run",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "passed",
+          "method": "Point-in-time post-response process-command inspection found zero Cursor, managed-wrapper, or Engram provider processes.",
+          "observed_count": 0
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "lsof against the Engram database, WAL, and SHM during the post-response inspection.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "passed",
+          "method": "Direct enumeration of managed client-lease locations during the post-response inspection.",
+          "observed_count": 0
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "This is one owner-assisted mem_current_project result from the exact pinned Cursor application and embedded MCP extension in one generated registered worktree, not broad Cursor support.",
+        "The exact tool-call execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+        "The project MCP server was initially disabled and required explicit owner enablement before the call.",
+        "The project-local configuration supplied the expected project explicitly; the result does not establish dynamic project discovery.",
+        "No model-provider, account, subscription, or credential state was inspected or inferred.",
+        "No memory content was read or saved; memory read/write correctness was not tested.",
+        "Unregistered, missing-remote, explicit-mismatch, registry-collision, provider-unavailable, multi-project, clean-profile, credential-isolation, instruction-lifecycle, restart, and other-platform cases remain unrun.",
+        "The post-response probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/cursor-3.16.17-darwin-arm64-current-project-20260817.json",
+          "sha256": "6ee262bee25cb86fc82749386100024d0f3c7e8f5f87c9ed34945d957d7676c4"
+        }
+      ]
+    },
+    {
+      "id": "antigravity-cli-1-1-13-current-project-20260817",
+      "host_id": "antigravity",
+      "execution_mode": "standalone_cli",
+      "recorded_at": "2026-08-17T21:44:09Z",
+      "executed_at": null,
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "standalone_engine",
+          "name": "Antigravity CLI (agy)",
+          "version": "1.1.13",
+          "sha256": "067ca11a713f61b54aea18358a40efb65d32276401b8c173d0a97e94de215286"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "db1e1b5cb2b7300e9052f3353bcbeae5ea8c19ed",
+        "source_tree_context": "3f223c74a9d1e847c300d905429ed7a1e9b04797",
+        "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": "naos-engram-memories",
+        "provider_source": "process_override",
+        "project_path_state": "empty",
+        "incoming_project_signal": "present",
+        "workspace_signal": "process_cwd",
+        "wrapper_resolution_source": "registered_explicit_project",
+        "workspace_kind": "synthetic_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "passed",
+        "wrapper_resolution_provenance": "passed",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "not_run",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "passed",
+          "method": "Exact current-session agy, managed-wrapper, and Engram provider process IDs were absent after the owner exited; an older August 11 probe was separately identified by start time and excluded.",
+          "observed_count": 0
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "lsof against the Engram database, WAL, and SHM after the owner exited the current CLI session.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "passed",
+          "method": "Direct enumeration of the managed client-lease directory after the owner exited the current CLI session.",
+          "observed_count": 0
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "This is one owner-assisted mem_current_project result from the exact pinned Antigravity CLI executable in one disposable registered workspace, not broad Antigravity CLI support.",
+        "The exact tool-call execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+        "The project-local configuration supplied the expected project explicitly; the result does not establish dynamic project discovery.",
+        "The displayed Gemini model label was not treated as provider, account, subscription, or credential evidence.",
+        "No memory content was read or saved; memory read/write correctness was not tested.",
+        "A separate August 11 automated agy probe was already orphaned before this session and was terminated after the current sessions exited cleanly; it is not attributed to this observation.",
+        "Unregistered, missing-remote, explicit-mismatch, registry-collision, provider-unavailable, multi-project, clean-profile, credential-isolation, instruction-lifecycle, restart, and other-platform cases remain unrun.",
+        "The post-quit probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/antigravity-cli-1.1.13-darwin-arm64-current-project-20260817.json",
+          "sha256": "030a1e7539cc3e8e172a1b5467758379a99b8215b7635472b32a00e32334a45b"
+        }
+      ]
+    },
+    {
+      "id": "antigravity-desktop-app-2-3-1-current-project-20260817",
+      "host_id": "antigravity",
+      "execution_mode": "desktop_app_embedded_engine",
+      "recorded_at": "2026-08-17T21:44:09Z",
+      "executed_at": null,
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "outer_application",
+          "name": "Antigravity",
+          "version": "2.3.1",
+          "sha256": "596a6c028d1a91c6e2306a2ec9ac0afe58bb68cf8d632bc29af90e956f1e110e"
+        },
+        {
+          "role": "embedded_engine",
+          "name": "Antigravity language server",
+          "version": "not_independently_reported",
+          "sha256": "49c961597501ed4c648adc5347ceef26bdb48b813305058393ab76b5233a0e21"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "db1e1b5cb2b7300e9052f3353bcbeae5ea8c19ed",
+        "source_tree_context": "3f223c74a9d1e847c300d905429ed7a1e9b04797",
+        "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": "naos-engram-memories",
+        "provider_source": "process_override",
+        "project_path_state": "empty",
+        "incoming_project_signal": "present",
+        "workspace_signal": "process_cwd",
+        "wrapper_resolution_source": "registered_explicit_project",
+        "workspace_kind": "synthetic_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "passed",
+        "wrapper_resolution_provenance": "passed",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "not_run",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "passed",
+          "method": "Exact current-session Antigravity, language-server, managed-wrapper, and Engram provider process IDs were absent after the owner fully quit the app.",
+          "observed_count": 0
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "lsof against the Engram database, WAL, and SHM after the owner fully quit the app.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "passed",
+          "method": "Direct enumeration of the managed client-lease directory after the owner fully quit the app.",
+          "observed_count": 0
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "This is one owner-assisted mem_current_project result from the exact pinned Antigravity application and embedded language server in one disposable registered workspace, not broad Antigravity support.",
+        "The exact tool-call execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+        "The application MCP child used the filesystem root as its process cwd; the correct project came from the explicit project signal, not workspace-derived resolution.",
+        "The live language-server process received IDE override value 2.8.1, but that value is not treated as the language-server version; the bundled executable is bound by its exact hash.",
+        "No model-provider, account, subscription, or credential state was inspected or inferred.",
+        "No memory content was read or saved; memory read/write correctness was not tested.",
+        "A separate August 11 automated agy probe was already orphaned before this session and was terminated after the current sessions exited cleanly; it is not attributed to this observation.",
+        "Unregistered, missing-remote, explicit-mismatch, registry-collision, provider-unavailable, multi-project, clean-profile, credential-isolation, instruction-lifecycle, restart, and other-platform cases remain unrun.",
+        "The post-quit probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/antigravity-2.3.1-darwin-arm64-current-project-20260817.json",
+          "sha256": "9ecd5cbf5a956f855cd97395a9bba1226f3980ac71d2ee0e8441f0d1a6ce5649"
+        }
+      ]
+    },
+    {
+      "id": "kilo-code-vscode-extension-7-4-22-current-project-20260817",
+      "host_id": "kilo",
+      "execution_mode": "desktop_app_embedded_engine",
+      "recorded_at": "2026-08-17T22:34:50Z",
+      "executed_at": null,
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "outer_application",
+          "name": "Visual Studio Code",
+          "version": "1.133.0",
+          "sha256": "2c4e000626b3aae4806530191246f9f2bfc9c81f95073c316fb7deba53e0ae75"
+        },
+        {
+          "role": "embedded_engine",
+          "name": "Kilo Code extension",
+          "version": "7.4.22",
+          "sha256": "56236fb823b13a769eb1570cb0736840e5cdabb96003268f96326dca6d22d8a1"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "fc4653a29d4d067617da5b9fa7949f1bd3d75ba8",
+        "source_tree_context": "4cd4eb69c8d845a92ae5ba68f1c67f6bbb497b9a",
+        "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": "naos-engram-memories",
+        "provider_source": "process_override",
+        "project_path_state": "empty",
+        "incoming_project_signal": "present",
+        "workspace_signal": "process_cwd",
+        "wrapper_resolution_source": "registered_explicit_project",
+        "workspace_kind": "registered_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "passed",
+        "wrapper_resolution_provenance": "passed",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "not_run",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "passed",
+          "method": "Exact current-session Visual Studio Code, Kilo Code extension, managed-wrapper, and Engram provider processes were absent after the owner fully quit Visual Studio Code.",
+          "observed_count": 0
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "lsof against the Engram database, WAL, and SHM after the owner fully quit Visual Studio Code.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "passed",
+          "method": "Direct enumeration of the managed client-lease directory after the owner fully quit Visual Studio Code.",
+          "observed_count": 0
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "This is one owner-assisted mem_current_project result from the exact pinned Visual Studio Code application and Kilo Code extension in one disposable registered repository, not broad Kilo support.",
+        "The exact tool-call execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+        "The disposable workspace was at db1e1b5cb2b7300e9052f3353bcbeae5ea8c19ed during the call, two commits behind its then-current origin/main; the managed wrapper hash binds the installed runtime used for the call.",
+        "Kilo added its standard $schema field to the ignored project configuration during startup; the toolkit verifier and repeated dry-run still classified the resulting entry as valid and already configured.",
+        "The project-local configuration supplied the expected project explicitly; the result does not establish dynamic project discovery.",
+        "No model-provider, account, subscription, or credential state was inspected or inferred.",
+        "No memory content was read or saved; memory read/write correctness was not tested.",
+        "Comment-bearing JSONC, unregistered, missing-remote, explicit-mismatch, registry-collision, provider-unavailable, multi-project, clean-profile, credential-isolation, instruction-lifecycle, restart, and other-platform cases remain unrun.",
+        "The post-response probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/kilo-code-7.4.22-darwin-arm64-current-project-20260817.json",
+          "sha256": "3b4bab35f5adb221da078b69fb84ae81610d39acb31fb1da4584b3d157820872"
+        }
+      ]
+    },
+    {
+      "id": "codex-desktop-26-810-52044-workspace-signal-negative-20260818",
+      "host_id": "codex",
+      "execution_mode": "desktop_app_embedded_engine",
+      "recorded_at": "2026-08-18T06:28:07Z",
+      "executed_at": "2026-08-18T06:24:32Z",
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "outer_application",
+          "name": "Codex desktop app",
+          "version": "26.810.52044",
+          "sha256": "4434580dba9c485e1b9f19716bfb13e020ffc75f9e328e4abc6e6d1b1dd00bb9"
+        },
+        {
+          "role": "embedded_engine",
+          "name": "Codex app server",
+          "version": "0.148.0-alpha.9",
+          "sha256": "6170ff5578170ee9b74ad92bfcff96e6186f41d02b60815a7c2b01ad424c754f"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "b94216f0329d305fe509c949c0f3719b9dd6bc59",
+        "source_tree_context": "0575cef80e93b4a4166eb1c53e39498fd54c05b8",
+        "installed_wrapper_sha256": "b8a7bc31786ec51f7ae4c521584deb30816b60c219646703d62981f4a369cb17"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": null,
+        "provider_source": "not_retained",
+        "project_path_state": "not_retained",
+        "incoming_project_signal": "absent",
+        "workspace_signal": "process_cwd",
+        "wrapper_resolution_source": "not_retained",
+        "workspace_kind": "synthetic_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "not_retained",
+        "mem_current_project": "not_performed",
+        "registered_canonical_project": "not_performed",
+        "workspace_signal_provenance": "passed",
+        "wrapper_resolution_provenance": "not_retained",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "passed",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "passed",
+          "method": "Exact fixture-path and process-command inspection found no isolated Codex desktop, crash-handler, managed-wrapper, or Engram provider process after containment.",
+          "observed_count": 0
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "lsof against the production Engram database, WAL, and SHM found no holder after containment; the provider was not observed and no synthetic database was created.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "passed",
+          "method": "Direct inspection found no client lease in the isolated managed provider client-lease directory after containment.",
+          "observed_count": 0
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "This is negative evidence for the exact pinned Codex desktop application and embedded engine: the MCP child used filesystem root rather than the selected synthetic workspace.",
+        "No mem_current_project or other memory tool was called, no memory content was accessed, and the configured provider was not observed to spawn.",
+        "The launch guard failed to detect an already-running production application, so the isolated profile ran concurrently with it; the isolated HOME, CODEX_HOME, and Electron user-data paths remained distinct and the production Codex configuration hash remained unchanged.",
+        "The host log proved that the application knew the expected workspace for Git prefetch while the separately retained MCP-child cwd was filesystem root.",
+        "Wrapper resolver stderr and exit status were not retained. The source-bound wrapper would resolve from that observed process cwd before provider verification, lease creation, or spawn, but this observation does not claim a directly observed exit code.",
+        "This falsifies Card 09 hypothesis H2 for the exact execution path; it does not establish behavior for another release or authorize a CLI-only adapter.",
+        "The containment probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/codex-desktop-26.810.52044-embedded-0.148.0-alpha.9-darwin-arm64-workspace-signal-negative-20260818.json",
+          "sha256": "7c503e29f57059fade73026d57589121fb78facc8a1af2e4c009fbb51752f036"
+        }
+      ]
+    },
+    {
+      "id": "codex-desktop-26-810-52044-project-config-current-project-20260818",
+      "host_id": "codex",
+      "execution_mode": "desktop_app_embedded_engine",
+      "recorded_at": "2026-08-18T08:25:29Z",
+      "executed_at": "2026-08-18T08:09:22.979Z",
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "outer_application",
+          "name": "Codex desktop app",
+          "version": "26.810.52044",
+          "sha256": "4434580dba9c485e1b9f19716bfb13e020ffc75f9e328e4abc6e6d1b1dd00bb9"
+        },
+        {
+          "role": "embedded_engine",
+          "name": "Codex app server",
+          "version": "0.148.0-alpha.9",
+          "sha256": "6170ff5578170ee9b74ad92bfcff96e6186f41d02b60815a7c2b01ad424c754f"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "e69b8f4eae0743776f5e847cf5d1783c1f19e087",
+        "source_tree_context": "23e3e800a8530eabefbf511cc7f9b6208bb97b64",
+        "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": "naos-engram-memories",
+        "provider_source": "process_override",
+        "project_path_state": "empty",
+        "incoming_project_signal": "absent",
+        "workspace_signal": "process_cwd",
+        "wrapper_resolution_source": "approved_git_remote",
+        "workspace_kind": "synthetic_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "passed",
+        "wrapper_resolution_provenance": "passed",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "passed",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "not_retained",
+          "method": "An immediate post-quit runtime-process probe was not retained for this positive Desktop run.",
+          "observed_count": null
+        },
+        "database_holders": {
+          "status": "not_retained",
+          "method": "An immediate post-quit database-holder probe was not retained for this positive Desktop run.",
+          "observed_count": null
+        },
+        "client_leases": {
+          "status": "not_retained",
+          "method": "An immediate post-quit client-lease probe was not retained for this positive Desktop run.",
+          "observed_count": null
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "This exact positive case used a project-local Codex config with an explicit absolute cwd, required startup, and no fixed ENGRAM_PROJECT; it does not invalidate the retained negative result for the earlier no-cwd configuration.",
+        "The absolute cwd must be rendered separately for each registered workspace or worktree and is not dynamic workspace discovery.",
+        "Credential canaries, immediate clean quit, required negative identity cases, restart, instruction lifecycle, and other platforms remain unrun.",
+        "No memory content was read or saved; memory read and write correctness were not tested."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/codex-desktop-26.810.52044-embedded-0.148.0-alpha.9-darwin-arm64-project-config-current-project-20260818.json",
+          "sha256": "65ef5abef727f59fc1fc3e9a653f14d23f8b0c7116f7db764228ece83d67a1f2"
+        }
+      ]
+    },
+    {
+      "id": "codex-vscode-1-133-0-extension-26-814-41407-current-project-20260818",
+      "host_id": "codex",
+      "execution_mode": "ide_extension_embedded_engine",
+      "recorded_at": "2026-08-18T08:25:29Z",
+      "executed_at": "2026-08-18T08:17:44.696Z",
+      "platform": {
+        "os": "macos",
+        "os_version": "26.6.1",
+        "os_build": "25G76",
+        "architecture": "arm64"
+      },
+      "host_layers": [
+        {
+          "role": "outer_application",
+          "name": "Visual Studio Code",
+          "version": "1.133.0",
+          "sha256": "2c4e000626b3aae4806530191246f9f2bfc9c81f95073c316fb7deba53e0ae75"
+        },
+        {
+          "role": "ide_extension",
+          "name": "OpenAI Codex VS Code extension",
+          "version": "26.814.41407",
+          "sha256": null
+        },
+        {
+          "role": "embedded_engine",
+          "name": "Codex app server",
+          "version": "0.148.0-alpha.15",
+          "sha256": "eb2cd2ee6119b46c4af9051713865970011e67d00660c1c1aadec92ad29edae8"
+        }
+      ],
+      "provider": {
+        "name": "Engram",
+        "version": "1.20.0",
+        "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+      },
+      "toolkit": {
+        "version": "0.1.0",
+        "source_commit_context": "e69b8f4eae0743776f5e847cf5d1783c1f19e087",
+        "source_tree_context": "23e3e800a8530eabefbf511cc7f9b6208bb97b64",
+        "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+      },
+      "project_resolution": {
+        "expected_project": "naos-engram-memories",
+        "returned_project": "naos-engram-memories",
+        "provider_source": "process_override",
+        "project_path_state": "empty",
+        "incoming_project_signal": "absent",
+        "workspace_signal": "process_cwd",
+        "wrapper_resolution_source": "approved_git_remote",
+        "workspace_kind": "synthetic_git_repository"
+      },
+      "checks": {
+        "host_connected_mcp_server": "passed",
+        "mem_current_project": "passed",
+        "registered_canonical_project": "passed",
+        "workspace_signal_provenance": "passed",
+        "wrapper_resolution_provenance": "passed",
+        "memory_read": "not_performed",
+        "memory_save": "not_performed",
+        "unregistered_project": "not_run",
+        "remote_mismatch": "not_run",
+        "provider_unavailable": "not_run",
+        "several_projects_isolated": "not_run",
+        "clean_profile_isolation": "not_run",
+        "credential_isolation": "not_run",
+        "restart_persistence": "not_run"
+      },
+      "clean_quit": {
+        "runtime_processes": {
+          "status": "passed",
+          "method": "Post-quit process-command inspection found no Visual Studio Code extension host, managed wrapper, or Engram provider process.",
+          "observed_count": 0
+        },
+        "database_holders": {
+          "status": "passed",
+          "method": "Post-quit lsof inspection found no holder of the Engram database, WAL, or SHM.",
+          "observed_count": 0
+        },
+        "client_leases": {
+          "status": "passed",
+          "method": "Post-quit direct inspection found no file in the managed provider client-lease directory.",
+          "observed_count": 0
+        }
+      },
+      "runtime_support_claim": false,
+      "disposition": "partial_real_host_evidence_not_promoted",
+      "limitations": [
+        "The Codex VS Code extension shares host_id codex and the project-local config.toml surface; codex-vscode remains a non-independent alias.",
+        "This exact positive case used an explicit absolute cwd that must be rendered separately for each registered workspace or worktree.",
+        "The existing VS Code and Codex profile was used; clean-profile and credential-canary isolation were not tested.",
+        "Required negative identity cases, restart, instruction lifecycle, and other platforms remain unrun.",
+        "No memory content was read or saved; memory read and write correctness were not tested.",
+        "The clean-quit probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+      ],
+      "source_refs": [
+        {
+          "repository_path": "docs/evidence/codex-vscode-1.133.0-extension-26.814.41407-embedded-0.148.0-alpha.15-darwin-arm64-project-config-current-project-20260818.json",
+          "sha256": "f0ab6b308e507df4a8cf53ebb665296af65505f30130f2537296f122cf6685d8"
+        }
+      ]
+    }
+  ]
+}

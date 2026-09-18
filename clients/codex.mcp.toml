@@ -1,0 +1,6 @@
+[mcp_servers.engram]
+command = "__ENGRAM_MCP_WRAPPER__"
+cwd = "__ENGRAM_WORKSPACE__"
+enabled = true
+required = true
+startup_timeout_sec = 30

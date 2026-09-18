@@ -1,0 +1,26 @@
+{
+  "checks": {
+    "host_spawned_wrapper": "passed",
+    "mcp_tool_call_mem_current_project": "passed",
+    "registered_canonical_project": "passed",
+    "memory_read_or_save": "not_performed",
+    "unregistered_project": "not_run_in_real_host",
+    "remote_mismatch": "not_run_in_real_host",
+    "provider_unavailable": "not_run_in_real_host",
+    "several_projects_isolated": "not_run_in_real_host"
+  },
+  "disposition": "partial_real_host_evidence_not_promoted",
+  "engram_version": "engram 1.20.0",
+  "executed_at": "2026-08-13T14:06:42.897794+00:00",
+  "expected_project": "example-product",
+  "host": "Codex CLI",
+  "host_version": "0.145.0",
+  "limitations": [
+    "Only the registered-project case ran through the named host; the remaining real-host negative cases are still required.",
+    "The process was ephemeral and read-only, but used the operator's existing Codex authentication.",
+    "This does not certify the Codex desktop GUI, IDE shell, Ubuntu, or another version."
+  ],
+  "platform": "darwin_arm64",
+  "schema_version": 1,
+  "synthetic_project": true
+}

@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/naos-engram/mcp-host-startup-receipt.v1.schema.json",
+  "title": "NAOS Engram real-host startup receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "host_id",
+    "evidence_class",
+    "evidence_scope",
+    "runtime_support_claim",
+    "platform",
+    "source",
+    "host",
+    "isolation",
+    "fixtures",
+    "checks",
+    "disposition",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "host_id": {"const": "opencode-v1"},
+    "evidence_class": {"const": "real_host"},
+    "evidence_scope": {"const": "startup_initialize_tools_list"},
+    "runtime_support_claim": {"const": false},
+    "platform": {"const": "darwin_arm64"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_head", "git_tree", "clean"],
+      "properties": {
+        "git_head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "git_tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "clean": {"type": "boolean"}
+      }
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resolved_executable", "version", "sha256", "architecture", "package_provenance"],
+      "properties": {
+        "resolved_executable": {"type": "string", "minLength": 1},
+        "version": {"const": "1.18.18"},
+        "sha256": {"const": "4f5979c2dadb06fbff1335335afaaea274e58f92e79aa43cf2ed98618d555422"},
+        "architecture": {"const": "arm64"},
+        "package_provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "tap", "tap_git_head", "install_receipt_sha256", "formula_sha256", "release_asset_url", "release_asset_sha256", "release_asset_binding"],
+          "properties": {
+            "kind": {"const": "homebrew"},
+            "tap": {"const": "anomalyco/tap"},
+            "tap_git_head": {"type": ["string", "null"]},
+            "install_receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "formula_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "release_asset_url": {"const": "https://github.com/anomalyco/opencode/releases/download/v1.18.18/opencode-darwin-arm64.zip"},
+            "release_asset_sha256": {"const": "7d668bf26496fec8686d4e51ebb1ac2bd2e393f0c1620aa696c4c242a9e5806a"},
+            "release_asset_binding": {"const": "installed_formula_darwin_arm64"}
+          }
+        }
+      }
+    },
+    "isolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["disposable_home", "live_home_accessed", "credentials_forwarded", "external_plugins_disabled", "autoupdate_disabled", "model_provider_used"],
+      "properties": {
+        "disposable_home": {"const": true},
+        "live_home_accessed": {"const": false},
+        "credentials_forwarded": {"type": "boolean"},
+        "external_plugins_disabled": {"const": true},
+        "autoupdate_disabled": {"const": true},
+        "model_provider_used": {"const": false}
+      }
+    },
+    "fixtures": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project_registry", "engram_provider", "production_memory_accessed"],
+      "properties": {
+        "project_registry": {"const": "synthetic"},
+        "engram_provider": {"const": "synthetic_stdio"},
+        "production_memory_accessed": {"const": false}
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host_exit_zero", "server_status_connected", "wrapper_argv_exact", "provider_environment_isolated", "unexpected_environment_variables", "expected_methods_observed", "methods_observed", "mem_current_project_listed", "tools_call_observed"],
+      "properties": {
+        "host_exit_zero": {"type": "boolean"},
+        "server_status_connected": {"type": "boolean"},
+        "wrapper_argv_exact": {"type": "boolean"},
+        "provider_environment_isolated": {"type": "boolean"},
+        "unexpected_environment_variables": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "expected_methods_observed": {"type": "boolean"},
+        "methods_observed": {"type": "array", "items": {"type": "string"}},
+        "mem_current_project_listed": {"type": "boolean"},
+        "tools_call_observed": {"type": "boolean"}
+      }
+    },
+    "disposition": {"enum": ["startup_validated_tool_call_unverified", "diagnostic_startup_validated_dirty_source", "failed"]},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "disposition": {
+            "enum": ["startup_validated_tool_call_unverified", "diagnostic_startup_validated_dirty_source"]
+          }
+        },
+        "required": ["disposition"]
+      },
+      "then": {
+        "properties": {
+          "isolation": {
+            "properties": {"credentials_forwarded": {"const": false}}
+          },
+          "checks": {
+            "properties": {
+              "host_exit_zero": {"const": true},
+              "server_status_connected": {"const": true},
+              "wrapper_argv_exact": {"const": true},
+              "provider_environment_isolated": {"const": true},
+              "unexpected_environment_variables": {"maxItems": 0},
+              "expected_methods_observed": {"const": true},
+              "methods_observed": {"const": ["initialize", "notifications/initialized", "tools/list"]},
+              "mem_current_project_listed": {"const": true},
+              "tools_call_observed": {"const": false}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"disposition": {"const": "startup_validated_tool_call_unverified"}},
+        "required": ["disposition"]
+      },
+      "then": {
+        "properties": {"source": {"properties": {"clean": {"const": true}}}}
+      }
+    },
+    {
+      "if": {
+        "properties": {"disposition": {"const": "diagnostic_startup_validated_dirty_source"}},
+        "required": ["disposition"]
+      },
+      "then": {
+        "properties": {"source": {"properties": {"clean": {"const": false}}}}
+      }
+    },
+    {
+      "if": {
+        "properties": {"disposition": {"const": "failed"}},
+        "required": ["disposition"]
+      },
+      "then": {
+        "anyOf": [
+          {"properties": {"isolation": {"properties": {"credentials_forwarded": {"const": true}}}}},
+          {"properties": {"checks": {"properties": {"host_exit_zero": {"const": false}}}}},
+          {"properties": {"checks": {"properties": {"server_status_connected": {"const": false}}}}},
+          {"properties": {"checks": {"properties": {"wrapper_argv_exact": {"const": false}}}}},
+          {"properties": {"checks": {"properties": {"provider_environment_isolated": {"const": false}}}}},
+          {"properties": {"checks": {"properties": {"unexpected_environment_variables": {"minItems": 1}}}}},
+          {"properties": {"checks": {"properties": {"expected_methods_observed": {"const": false}}}}},
+          {"properties": {"checks": {"properties": {"methods_observed": {"not": {"const": ["initialize", "notifications/initialized", "tools/list"]}}}}}},
+          {"properties": {"checks": {"properties": {"mem_current_project_listed": {"const": false}}}}},
+          {"properties": {"checks": {"properties": {"tools_call_observed": {"const": true}}}}}
+        ]
+      }
+    }
+  ]
+}

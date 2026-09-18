@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/naos-engram/mcp-host-acceptance-report.v1.schema.json",
+  "title": "NAOS Engram MCP host acceptance report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "matrix_version",
+    "generated_at",
+    "platform",
+    "synthetic_only",
+    "live_home_accessed",
+    "credentials_forwarded",
+    "observation_register",
+    "coverage",
+    "scenario_results",
+    "host_results",
+    "combination_results",
+    "limitations",
+    "disposition"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "matrix_version": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "platform": {
+      "enum": ["darwin_arm64", "ubuntu_24_04_amd64_container"]
+    },
+    "synthetic_only": {"const": true},
+    "live_home_accessed": {"const": false},
+    "credentials_forwarded": {"const": false},
+    "observation_register": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["register_version", "sha256", "observation_count"],
+      "properties": {
+        "register_version": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "observation_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["catalogue_hosts", "matrix_hosts", "reported_hosts", "complete"],
+      "properties": {
+        "catalogue_hosts": {"type": "integer", "minimum": 1},
+        "matrix_hosts": {"type": "integer", "minimum": 1},
+        "reported_hosts": {"type": "integer", "minimum": 1},
+        "complete": {"type": "boolean"}
+      }
+    },
+    "scenario_results": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/check"}
+    },
+    "host_results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "host_id",
+          "catalogue_support_tier",
+          "current_evidence_class",
+          "acceptance_target",
+          "static_schema",
+          "local_probe",
+          "runtime_support_claim",
+          "observation_refs",
+          "blocker",
+          "promotion_command",
+          "promotion_gate",
+          "disposition"
+        ],
+        "properties": {
+          "host_id": {"type": "string", "minLength": 1},
+          "catalogue_support_tier": {"type": "string", "minLength": 1},
+          "current_evidence_class": {
+            "enum": ["real_host", "headless_extension_host", "mcp_protocol", "static_schema"]
+          },
+          "acceptance_target": {
+            "enum": ["real_host", "headless_extension_host", "ineligible"]
+          },
+          "static_schema": {"$ref": "#/$defs/check"},
+          "local_probe": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["status", "evidence_class", "runtime_support_claim"],
+            "properties": {
+              "status": {"enum": ["not_requested", "not_applicable", "binary_unavailable", "executed"]},
+              "evidence_class": {"enum": ["static_schema", "real_host_inventory"]},
+              "runtime_support_claim": {"const": false},
+              "binary": {"type": "string"},
+              "version": {"type": ["string", "null"]},
+              "checks": {
+                "type": "array",
+                "items": {"$ref": "#/$defs/check"}
+              }
+            }
+          },
+          "runtime_support_claim": {"type": "boolean"},
+          "observation_refs": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}
+          },
+          "blocker": {"type": "string", "minLength": 1},
+          "promotion_command": {"type": "string", "minLength": 1},
+          "promotion_gate": {"type": "string", "minLength": 1},
+          "disposition": {"enum": ["not_promoted", "ineligible"]}
+        }
+      }
+    },
+    "combination_results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "host_id",
+          "platform",
+          "provider_profile",
+          "status",
+          "evidence_class",
+          "runtime_support_claim",
+          "detail"
+        ],
+        "properties": {
+          "host_id": {"type": "string", "minLength": 1},
+          "platform": {"enum": ["darwin_arm64", "ubuntu_24_04_amd64_container"]},
+          "provider_profile": {"type": "string", "minLength": 1},
+          "status": {"enum": ["blocked", "not_applicable"]},
+          "evidence_class": {
+            "enum": ["mcp_protocol", "static_schema"]
+          },
+          "runtime_support_claim": {"const": false},
+          "detail": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "disposition": {"enum": ["classified_not_promoted", "invalid"]}
+  },
+  "$defs": {
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "evidence_class", "runtime_support_claim"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "status": {"enum": ["passed", "failed", "blocked", "not_applicable"]},
+        "evidence_class": {
+          "enum": ["real_host", "headless_extension_host", "mcp_protocol", "static_schema", "real_host_inventory"]
+        },
+        "runtime_support_claim": {"type": "boolean"},
+        "detail": {"type": "string"}
+      }
+    }
+  }
+}

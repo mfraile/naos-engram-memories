@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-08-18T06:28:07Z",
+  "executed_at": "2026-08-18T06:24:32Z",
+  "host": {
+    "outer_application": {
+      "name": "Codex desktop app (ChatGPT.app bundle com.openai.codex)",
+      "version": "26.810.52044",
+      "build": "6662",
+      "sha256": "4434580dba9c485e1b9f19716bfb13e020ffc75f9e328e4abc6e6d1b1dd00bb9"
+    },
+    "embedded_engine": {
+      "name": "Codex app server",
+      "version": "0.148.0-alpha.9",
+      "sha256": "6170ff5578170ee9b74ad92bfcff96e6186f41d02b60815a7c2b01ad424c754f"
+    },
+    "execution_mode": "desktop_app_embedded_engine"
+  },
+  "platform": {
+    "os": "macos",
+    "os_version": "26.6.1",
+    "os_build": "25G76",
+    "architecture": "arm64"
+  },
+  "provider": {
+    "name": "Engram",
+    "version": "1.20.0",
+    "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a",
+    "execution_state": "configured_but_not_spawned"
+  },
+  "toolkit": {
+    "version": "0.1.0",
+    "source_commit_context": "b94216f0329d305fe509c949c0f3719b9dd6bc59",
+    "source_tree_context": "0575cef80e93b4a4166eb1c53e39498fd54c05b8",
+    "installed_wrapper_sha256": "b8a7bc31786ec51f7ae4c521584deb30816b60c219646703d62981f4a369cb17"
+  },
+  "fixture": {
+    "workspace_kind": "synthetic_git_repository",
+    "workspace_commit": "8c8bc0efe216c9d8ce2f56f82ec6c99de8c92eaa",
+    "workspace_tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+    "workspace_remote": "credential-free example.invalid remote",
+    "workspace_opened_by_desktop": true,
+    "desktop_git_prefetch_used_expected_workspace": true,
+    "fresh_home": true,
+    "fresh_codex_home": true,
+    "fresh_electron_user_data": true,
+    "existing_credentials_copied": false,
+    "existing_settings_plugins_or_hooks_copied": false,
+    "isolated_profile_account_state": "unauthenticated",
+    "mcp_entry_has_static_cwd": false,
+    "mcp_entry_has_project_argument": false,
+    "mcp_entry_has_environment": false,
+    "production_instance_concurrently_running": true,
+    "launch_guard_failed_to_detect_production_instance": true,
+    "production_codex_config_sha256_before": "ee04ac663f550715b6d34cb0ebe012ca2b14e44e563e2f87281dbc367a6458aa",
+    "production_codex_config_sha256_after": "ee04ac663f550715b6d34cb0ebe012ca2b14e44e563e2f87281dbc367a6458aa"
+  },
+  "mcp_child_observation": {
+    "server_entry_loaded_from_fixture_config": true,
+    "started_before_user_prompt": true,
+    "cwd_state": "filesystem_root",
+    "expected_workspace_match": false,
+    "argv_count": 0,
+    "incoming_environment_key_presence": {
+      "ENGRAM_PROJECT": false,
+      "CLAUDE_PROJECT_DIR": false,
+      "CODEX_HOME": false,
+      "OPENAI_API_KEY": false,
+      "ANTHROPIC_API_KEY": false,
+      "GEMINI_API_KEY": false
+    },
+    "wrapper_resolution_source": "not_reached_or_not_retained",
+    "provider_spawned": false,
+    "mem_current_project_call_count": 0,
+    "other_memory_tools_called": false,
+    "memory_content_accessed": false
+  },
+  "post_test": {
+    "isolated_desktop_processes": 0,
+    "isolated_crash_handler_processes": 0,
+    "managed_wrapper_processes": 0,
+    "provider_processes": 0,
+    "production_database_holder_processes": 0,
+    "synthetic_database_created": false,
+    "client_lease_entries": 0,
+    "production_desktop_instance_remained_running": true
+  },
+  "runtime_support_claim": false,
+  "disposition": "negative_real_host_evidence_not_promoted",
+  "card09_result": "desktop_workspace_signal_rejected_redesign_required",
+  "claim_ceiling": "The exact Codex desktop application loaded an isolated Engram server declaration while an explicit synthetic Git workspace was open, but it launched that MCP child from the filesystem root with no project signal. No memory tool was called and the provider was not spawned. This falsifies Card 09 hypothesis H2 for the pinned application and embedded-engine versions; it does not establish behavior for another release or authorize a CLI-only adapter.",
+  "limitations": [
+    "The launch guard failed to detect the already-running production application, so the isolated profile ran concurrently with it. Distinct HOME, CODEX_HOME, and Electron user-data paths were observed, and the production configuration hash remained unchanged.",
+    "The isolated application was unauthenticated and no prompt was submitted. The MCP entry nevertheless started during application initialization, which was sufficient to observe its child cwd and disprove the required workspace signal without a memory call.",
+    "The managed monitor retained the child cwd and selected environment-key presence only. Normal host logs separately showed that the desktop application knew the expected workspace for Git prefetch, but did not retain a wrapper resolver error.",
+    "The configured provider identity and hash came from the isolated adopted-provider state; the provider did not spawn in this test.",
+    "This exact negative result does not prove that every future Codex desktop release lacks a safe task-specific signal. A documented, version-appropriate alternative would require a new design and separate authorization.",
+    "The clean-containment probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+  ]
+}

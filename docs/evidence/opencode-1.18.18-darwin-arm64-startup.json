@@ -1,0 +1,65 @@
+{
+  "checks": {
+    "expected_methods_observed": true,
+    "host_exit_zero": true,
+    "mem_current_project_listed": true,
+    "methods_observed": [
+      "initialize",
+      "notifications/initialized",
+      "tools/list"
+    ],
+    "provider_environment_isolated": true,
+    "server_status_connected": true,
+    "tools_call_observed": false,
+    "unexpected_environment_variables": [],
+    "wrapper_argv_exact": true
+  },
+  "disposition": "startup_validated_tool_call_unverified",
+  "evidence_class": "real_host",
+  "evidence_scope": "startup_initialize_tools_list",
+  "fixtures": {
+    "engram_provider": "synthetic_stdio",
+    "production_memory_accessed": false,
+    "project_registry": "synthetic"
+  },
+  "generated_at": "2026-08-17T10:59:20.060585+00:00",
+  "host": {
+    "architecture": "arm64",
+    "package_provenance": {
+      "formula_sha256": "2ea4e315913f420e100cb7c122d2e59863f8b49a1b9dea2263542cb6bf5ccdd1",
+      "install_receipt_sha256": "ef47a9cee2b382d07ec988c99c5f65bfbdaf9f1672d698f62c67de6338686179",
+      "kind": "homebrew",
+      "release_asset_binding": "installed_formula_darwin_arm64",
+      "release_asset_sha256": "7d668bf26496fec8686d4e51ebb1ac2bd2e393f0c1620aa696c4c242a9e5806a",
+      "release_asset_url": "https://github.com/anomalyco/opencode/releases/download/v1.18.18/opencode-darwin-arm64.zip",
+      "tap": "anomalyco/tap",
+      "tap_git_head": "0ca09c8840a14458429b48bd4cc572b81c394270"
+    },
+    "resolved_executable": "/opt/homebrew/Cellar/opencode/1.18.18/bin/opencode",
+    "sha256": "4f5979c2dadb06fbff1335335afaaea274e58f92e79aa43cf2ed98618d555422",
+    "version": "1.18.18"
+  },
+  "host_id": "opencode-v1",
+  "isolation": {
+    "autoupdate_disabled": true,
+    "credentials_forwarded": false,
+    "disposable_home": true,
+    "external_plugins_disabled": true,
+    "live_home_accessed": false,
+    "model_provider_used": false
+  },
+  "limitations": [
+    "No model provider was invoked.",
+    "mem_current_project was listed but not called.",
+    "Network activity was not syscall-instrumented.",
+    "This receipt applies only to the exact pinned host binary, platform, source identity, and synthetic provider fixture."
+  ],
+  "platform": "darwin_arm64",
+  "runtime_support_claim": false,
+  "schema_version": 1,
+  "source": {
+    "clean": true,
+    "git_head": "9a5b7a96047d27380f8c6e154dea4ef2adc6257f",
+    "git_tree": "9016fc15a48a571b0dc30e756ca0bff8b8d146d0"
+  }
+}

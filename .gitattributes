@@ -1,0 +1,6 @@
+docs/evidence/*.json text eol=lf
+scripts/bootstrap.py text eol=lf
+scripts/bootstrap.sh text eol=lf
+scripts/bootstrap.ps1 text eol=lf
+scripts/engram_mcp_wrapper.sh text eol=lf
+scripts/engram_mcp_wrapper.ps1 text eol=lf

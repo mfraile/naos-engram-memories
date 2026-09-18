@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-08-17T23:36:11Z",
+  "executed_at": "2026-08-17T23:31:20Z",
+  "host": {
+    "standalone_engine": {
+      "name": "Codex CLI",
+      "version": "0.145.0",
+      "sha256": "1da3f4e0e96028b8a771814293c3033dafd1971f943f6c7e79b0897fe705f590"
+    },
+    "execution_mode": "standalone_cli"
+  },
+  "platform": {
+    "os": "macos",
+    "os_version": "26.6.1",
+    "os_build": "25G76",
+    "architecture": "arm64"
+  },
+  "provider": {
+    "name": "Engram",
+    "version": "1.20.0",
+    "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+  },
+  "toolkit": {
+    "version": "0.1.0",
+    "source_commit_context": "0b12e42019218694fa792490f33525e497b26822",
+    "source_tree_context": "d77abf9a67beb850be22e49f35903bebd6df0394",
+    "installed_wrapper_sha256": "d4c9b67e21bf64b70c39efc74eda6e5de86ff5371d522d9cc272673627797bf4"
+  },
+  "fixture": {
+    "workspace_kind": "synthetic_git_repository",
+    "workspace_commit": "d39c25a40c29a2ed146296cbbbda3c34943fa270",
+    "workspace_tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+    "workspace_remote": "credential-free example.invalid remote",
+    "workspace_clean_after_run": true,
+    "fresh_home": true,
+    "fresh_codex_home": true,
+    "fresh_device_authentication": true,
+    "existing_credentials_copied": false,
+    "existing_settings_plugins_or_hooks_copied": false,
+    "mcp_entry_has_static_cwd": false,
+    "mcp_entry_has_project_argument": false,
+    "mcp_entry_has_environment": false,
+    "production_codex_config_sha256_before": "ee04ac663f550715b6d34cb0ebe012ca2b14e44e563e2f87281dbc367a6458aa",
+    "production_codex_config_sha256_after": "ee04ac663f550715b6d34cb0ebe012ca2b14e44e563e2f87281dbc367a6458aa"
+  },
+  "invocation": {
+    "workspace_selected_with_cli_cd_option": true,
+    "approval_policy": "never",
+    "sandbox": "read-only",
+    "ephemeral": true,
+    "environment_started_empty": true,
+    "incoming_engram_project": "absent",
+    "incoming_claude_project_dir": "absent",
+    "path_alias_setup": "refused_temporary_codex_home",
+    "exact_absolute_cli_executable_invoked": true
+  },
+  "observations": {
+    "engram_mcp_server_exposed": true,
+    "mem_current_project_call_count": 1,
+    "expected_project": "naos-engram-memories",
+    "returned_project": "naos-engram-memories",
+    "provider_source": "process_override",
+    "project_path_state": "empty",
+    "available_projects_state": "null",
+    "returned_cwd_state": "exact_selected_workspace",
+    "workspace_signal": "process_cwd",
+    "wrapper_resolution_source": "approved_git_remote",
+    "wrapper_process_observed": true,
+    "wrapper_process_cwd_os_probe": "unavailable_transient_process",
+    "wrapper_environment_key_presence": {
+      "ENGRAM_PROJECT": false,
+      "CLAUDE_PROJECT_DIR": false,
+      "CODEX_HOME": false,
+      "OPENAI_API_KEY": false,
+      "ANTHROPIC_API_KEY": false,
+      "GEMINI_API_KEY": false
+    },
+    "other_memory_tools_called": false,
+    "memory_content_accessed": false
+  },
+  "post_response": {
+    "codex_fixture_processes": 0,
+    "managed_wrapper_processes": 0,
+    "provider_processes": 0,
+    "production_database_holder_processes": 0,
+    "synthetic_database_holder_processes": 0,
+    "client_lease_entries": 0,
+    "synthetic_database_created": true
+  },
+  "runtime_support_claim": false,
+  "disposition": "partial_real_host_evidence_not_promoted",
+  "claim_ceiling": "The exact Codex CLI binary completed one owner-assisted registered synthetic-workspace mem_current_project call after the CLI selected that workspace with -C. The returned cwd matched the selected workspace, the source-bound wrapper used process cwd, and the same registry resolved that cwd through its approved Git remote. This is one positive CLI signal case, not a supported adapter or evidence for Codex Desktop.",
+  "limitations": [
+    "The execution timestamp is derived from the first retained synthetic Engram database artifact timestamp rather than a host-issued tool-call timestamp.",
+    "The wrapper was observed with the expected environment-key absences, but its transient process exited before the operating-system cwd probe returned a path. Workspace provenance therefore combines the Codex workdir, the provider-returned cwd, the exact wrapper source and hash, and pre-run resolver proof.",
+    "The PATH-alias warning concerned refused helper creation under the disposable temporary Codex home; the exact absolute CLI executable still ran and completed the MCP call.",
+    "Codex populated built-in skills, caches, local state databases, and a remote plugin catalogue inside the fresh disposable Codex home. No existing user credentials, settings, plugins, hooks, or production Codex configuration were copied.",
+    "Credential key names were absent at the observed wrapper process, but no explicit credential canaries were injected; the complete credential-isolation case remains unrun.",
+    "Unregistered, missing-remote, inherited-project refusal, registry-collision, provider-unavailable, nested, linked-worktree, same-basename, sequential or concurrent multi-project, restart, instruction-lifecycle, Desktop, and other-platform cases remain unrun.",
+    "No memory content was read or saved; memory read and write correctness were not tested.",
+    "The clean-quit probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "checks": {
+    "clone_free_wheel_install": "passed",
+    "durable_user_runtime": "passed",
+    "installed_asset_integrity": "passed",
+    "managed_provider_binding": "passed",
+    "offline_wheel_build": "passed",
+    "provider_adoption_binding": "passed",
+    "unregistered_project_fails_closed": "passed",
+    "wrapper_current_project": "passed",
+    "wrapper_mcp_initialize": "passed",
+    "wrapper_tools_list": "passed"
+  },
+  "disposition": "candidate_passed_not_release_attestation",
+  "engram_binary_sha256": "a8ef7767ca6f974fa6e5d9e143531f1888ac199c129186d446e406319e9bf551",
+  "engram_version": "engram 1.20.0",
+  "executed_at": "2026-09-18T11:54:19.643181+00:00",
+  "limitations": [
+    "This validates the provider and installed stdio wrapper, not a specific GUI or coding-agent host.",
+    "No live memory database, real client configuration, cloud transport, or production project was used.",
+    "External provider adoption executes the selected binary's version command; its network behavior was not observed by the validator.",
+    "The source checkout was dirty, so this is diagnostic candidate evidence and not final release attestation.",
+    "Windows experimental platform status was temporarily overridden only inside the disposable validation copy; release promotion remains a separate decision."
+  ],
+  "network_access_status": "not_observed_during_external_provider_adoption",
+  "network_accessed": null,
+  "package_input_exclusions": [
+    "docs/evidence/**",
+    ".git/**",
+    "build/**",
+    "dist/**",
+    "**/__pycache__/**",
+    "**/*.egg-info/**",
+    "Git-ignored files"
+  ],
+  "package_input_sha256": "e8253b2495461acd9411fce780bdbf0de44194bd0323016deb1f2acfa55d5b44",
+  "platform": {
+    "architecture": "AMD64",
+    "system": "Windows"
+  },
+  "python": "3.13.5",
+  "schema_version": 1,
+  "source_commit": "f8b42a63d159924bec5e10a10907ecb2e297f035",
+  "source_git_tree": "d3865071ad37c7b77dab4303930d7dbbafb66b58",
+  "source_worktree_dirty": true,
+  "synthetic_only": true,
+  "toolkit_version": "1.0.0",
+  "wheel_sha256": "c9e0ec9c8f9408d0f62152be7f1302c4f3819c43f2c1f09078165665148eebe2"
+}

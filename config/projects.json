@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "description": "Durable user registry. Add only explicitly reviewed project identities.",
+  "projects": []
+}

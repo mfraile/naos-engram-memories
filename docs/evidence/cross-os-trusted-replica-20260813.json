@@ -1,0 +1,32 @@
+{
+  "checks": {
+    "bounded_rebase_and_retry": "failed_manifest_conflict",
+    "canonical_project_buckets": "passed",
+    "concurrent_push_rejected": "passed",
+    "mac_to_ubuntu_handoff": "passed",
+    "no_change_export_noop": "not_reached",
+    "project_isolation": "passed",
+    "repeat_import_idempotent": "not_reached",
+    "separate_membership_stores": "passed",
+    "ubuntu_pending_handoff_created": "passed"
+  },
+  "disposition": "redesign_required_before_transport_promotion",
+  "engram_versions": {
+    "darwin_arm64": "engram 1.20.0",
+    "linux_amd64": "engram 1.20.0"
+  },
+  "executed_at": "2026-08-13T14:03:13.309732+00:00",
+  "limitations": [
+    "This is a non-shipping regression for the deferred personal or trusted-replica design.",
+    "A private Git replica is durable and revocation cannot retract prior clones or imported data.",
+    "The Ubuntu lane validates CLI/provider behavior, not native Linux GUI extensions."
+  ],
+  "linux_image_id": "sha256:974bc2dacc6808b54e577c9a30bbdfc8ac4e95c8434a51703f0b21fefa2744d4",
+  "platforms": [
+    "darwin_arm64",
+    "ubuntu_24.04_amd64_container"
+  ],
+  "schema_version": 1,
+  "shipping_feature_enabled": false,
+  "synthetic_only": true
+}

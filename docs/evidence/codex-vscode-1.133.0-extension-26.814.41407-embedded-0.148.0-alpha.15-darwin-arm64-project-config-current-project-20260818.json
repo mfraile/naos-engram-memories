@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-08-18T08:25:29Z",
+  "executed_at": "2026-08-18T08:17:44.696Z",
+  "host": {
+    "outer_application": {
+      "name": "Visual Studio Code",
+      "version": "1.133.0",
+      "commit": "a5b500951314efd502d07465bd138dfbd714a960",
+      "sha256": "2c4e000626b3aae4806530191246f9f2bfc9c81f95073c316fb7deba53e0ae75"
+    },
+    "ide_extension": {
+      "name": "OpenAI Codex VS Code extension",
+      "version": "26.814.41407",
+      "sha256": null
+    },
+    "embedded_engine": {
+      "name": "Codex app server",
+      "version": "0.148.0-alpha.15",
+      "sha256": "eb2cd2ee6119b46c4af9051713865970011e67d00660c1c1aadec92ad29edae8"
+    },
+    "execution_mode": "ide_extension_embedded_engine"
+  },
+  "platform": {
+    "os": "macos",
+    "os_version": "26.6.1",
+    "os_build": "25G76",
+    "architecture": "arm64"
+  },
+  "provider": {
+    "name": "Engram",
+    "version": "1.20.0",
+    "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+  },
+  "toolkit": {
+    "version": "0.1.0",
+    "source_commit_context": "e69b8f4eae0743776f5e847cf5d1783c1f19e087",
+    "source_tree_context": "23e3e800a8530eabefbf511cc7f9b6208bb97b64",
+    "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+  },
+  "fixture": {
+    "workspace_kind": "synthetic_git_repository",
+    "workspace_commit": "f76ced1f2222f01a5ba05c24a609f76d966e4096",
+    "workspace_tree": "336644791ae0cd3b9b45720863d7d02827840b49",
+    "workspace_remote": "canonical toolkit Git remote; credentials absent",
+    "workspace_path_retention": "absolute disposable path retained only in private raw evidence",
+    "workspace_clean_after_run": true,
+    "existing_vscode_profile_used": true,
+    "clean_profile_claim": false,
+    "project_config_sha256": "94b1b6239d90651a736febba04518e3b98e9e05b76d225f1bade9be0685b3be3",
+    "mcp_entry_scope": "project_local_codex_config",
+    "mcp_entry_has_absolute_static_cwd": true,
+    "mcp_entry_has_project_argument": false,
+    "mcp_entry_has_environment": false,
+    "mcp_entry_enabled": true,
+    "mcp_entry_required": true,
+    "mcp_entry_startup_timeout_sec": 30
+  },
+  "mcp_child_observation": {
+    "session_originator": "codex_vscode",
+    "session_source": "vscode",
+    "launch_monitor_sha256": "fa896922c37e287239c374c8c26d2c1eed386f8b14b6861dd7e04cd366d59838",
+    "private_launch_receipt_sha256": "6cd0ad388fc18271aa6a877acb2f2b91c7b48c07d1e9f77b72b694819cb8349d",
+    "cwd_state": "exact_configured_workspace",
+    "expected_workspace_match": true,
+    "argv_count": 0,
+    "incoming_environment_key_presence": {
+      "ENGRAM_PROJECT": false,
+      "CLAUDE_PROJECT_DIR": false,
+      "CODEX_HOME": false,
+      "OPENAI_API_KEY": false,
+      "ANTHROPIC_API_KEY": false,
+      "GEMINI_API_KEY": false,
+      "GOOGLE_API_KEY": false
+    },
+    "wrapper_resolution_source": "approved_git_remote",
+    "engram_mcp_server_exposed": true,
+    "mem_current_project_call_count": 1,
+    "expected_project": "naos-engram-memories",
+    "returned_project": "naos-engram-memories",
+    "provider_source": "process_override",
+    "project_path_state": "empty",
+    "available_projects_state": "null",
+    "returned_cwd_state": "exact_configured_workspace",
+    "other_memory_tools_called": false,
+    "memory_content_accessed": false
+  },
+  "post_response": {
+    "probed_at": "2026-08-18T08:25:29Z",
+    "relevant_vscode_extension_host_or_engram_processes": 0,
+    "production_database_holder_processes": 0,
+    "client_lease_entries": 0
+  },
+  "runtime_support_claim": false,
+  "disposition": "partial_real_host_evidence_not_promoted",
+  "claim_ceiling": "Visual Studio Code 1.133.0, the OpenAI Codex extension 26.814.41407, and embedded Codex 0.148.0-alpha.15 completed one owner-assisted mem_current_project call from a registered synthetic workspace using the same project-local .codex/config.toml design as Codex Desktop. This proves one exact-version IDE-extension identity path, not independent codex-vscode support or general Codex runtime support.",
+  "limitations": [
+    "The Codex VS Code extension is retained under host_id codex because it shares the Codex config.toml surface; codex-vscode remains a non-independent alias.",
+    "This positive case uses an explicit absolute cwd and therefore must be rendered separately for each registered workspace or worktree; it is not dynamic workspace discovery.",
+    "The existing VS Code and Codex user profile was used; clean-profile isolation was not tested.",
+    "The launch monitor observed credential-key absence, but no credential canaries were injected; credential isolation remains unrun.",
+    "Unregistered, missing-remote, mismatch, multi-project, provider-unavailable, restart, instruction-lifecycle, and other-platform cases remain unrun.",
+    "No memory content was read or saved; memory read and write correctness were not tested.",
+    "The clean-quit probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-08-17T16:47:32Z",
+  "executed_at": null,
+  "host": {
+    "outer_application": {
+      "name": "Claude desktop app",
+      "version": "1.30096.5",
+      "sha256": "fbca82e3c0602dc167b6798e895c96f2ba49b1c701b4e1891e0b8324b8d2fd6e"
+    },
+    "embedded_engine": {
+      "name": "Claude Code",
+      "version": "2.1.229",
+      "sha256": "92678218823353283cf8d04038b9122c1a63e6d83ad2a6ba87897334204e6493"
+    },
+    "execution_mode": "desktop_app_embedded_engine"
+  },
+  "platform": {
+    "os": "macos",
+    "os_version": "26.6.1",
+    "os_build": "25G76",
+    "architecture": "arm64"
+  },
+  "toolkit": {
+    "version": "0.1.0",
+    "source_commit_context": "87eafa95537b15b834f7c8db1e73a88e4eed86bf",
+    "source_tree_context": "d9dac15d4e018f633e126cf735bd2334c4f9be55",
+    "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+  },
+  "case": {
+    "target": "unregistered_project",
+    "workspace_kind": "synthetic_git_repository",
+    "worktree_mode": false,
+    "workspace_clean_after_run": true,
+    "user_scoped_mcp_entry_present": true,
+    "fixed_engram_project_present": false
+  },
+  "observations": {
+    "engram_mcp_server_exposed": false,
+    "mem_current_project_exposed": false,
+    "other_memory_tools_called": false,
+    "wrapper_invocation_evidence_retained": false,
+    "wrapper_refusal_reason_retained": false,
+    "provider_call_evidence_retained": false
+  },
+  "post_quit": {
+    "claude_app_processes": 0,
+    "managed_wrapper_processes": 0,
+    "legacy_wrapper_processes": 0,
+    "provider_processes": 0,
+    "database_holder_processes": 0,
+    "client_lease_entries": 0
+  },
+  "runtime_support_claim": false,
+  "disposition": "partial_real_host_evidence_not_promoted",
+  "claim_ceiling": "The exact Claude desktop-app and embedded-engine versions completed one user-assisted session in a sanitized unregistered Git fixture where no Engram MCP server or memory tool was exposed. This establishes only the observed host-surface-unavailable result; it does not prove that the managed wrapper started or refused the unregistered remote.",
+  "limitations": [
+    "Normal Claude desktop logging retained the selected fixture, exact embedded-engine path and version, and clean application shutdown, but not the local Engram wrapper's startup or exit reason.",
+    "The unavailable tool surface may be consistent with fail-closed unregistered-project behavior, but wrapper invocation and resolver refusal were not independently observed.",
+    "No Engram memory or provider tool was called, and no memory content was read or saved.",
+    "The exact tool-call execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+    "This diagnostic observation does not satisfy the unregistered-project acceptance case and does not promote Claude host support."
+  ]
+}

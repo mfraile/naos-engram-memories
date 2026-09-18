@@ -1,0 +1,34 @@
+# Runtime memory data is local or organization-service data, never Git data.
+/.engram/
+engram.db
+engram.db-wal
+engram.db-shm
+*.bak
+
+# Local installer state and validation reports may contain machine-specific data.
+.engram-memory-local/
+validation-report.json
+
+# Per-workspace MCP launch configuration is installed locally. Templates and
+# the project registry are version-controlled; a workspace adapter is not.
+/.vscode/mcp.json
+/.cursor/mcp.json
+/.cursor/mcp.json.engram-backup-*
+/.agents/mcp_config.json
+/.agents/mcp_config.json.engram-backup-*
+/.kilo/kilo.jsonc
+/.kilo/kilo.jsonc.engram-backup-*
+/opencode.json
+/opencode.json.engram-backup-*
+
+# Test-generated Python bytecode is not source.
+__pycache__/
+*.py[cod]
+/build/
+/dist/
+/*.egg-info/
+/.kilo/
+
+# OS
+.DS_Store
+Thumbs.db

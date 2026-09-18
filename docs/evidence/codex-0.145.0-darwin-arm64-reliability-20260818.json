@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-08-18T09:12:12Z",
+  "execution_window": {
+    "started_at": "2026-08-18T09:05:52Z",
+    "ended_at": "2026-08-18T09:11:29Z"
+  },
+  "host": {
+    "standalone_engine": {
+      "name": "Codex CLI",
+      "version": "0.145.0",
+      "sha256": "1da3f4e0e96028b8a771814293c3033dafd1971f943f6c7e79b0897fe705f590"
+    },
+    "execution_mode": "standalone_cli"
+  },
+  "platform": {
+    "os": "macos",
+    "os_version": "26.6.1",
+    "os_build": "25G76",
+    "architecture": "arm64"
+  },
+  "provider": {
+    "name": "Engram",
+    "version": "1.20.0",
+    "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+  },
+  "toolkit": {
+    "version": "0.1.0",
+    "source_commit_context": "27eaa74d37d24e69ce4a1d009ae074da80de69ab",
+    "source_tree_context": "e6d413640d0457cbc48bbcfadd8d31df39e92d62",
+    "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07",
+    "codex_template_sha256": "20892f3a0588dcd48989f44c6a4f5a95ed098ed49d3f8d255ae93913ed96ef60"
+  },
+  "fixture": {
+    "workspace_storage": "private temporary directory; absolute paths omitted",
+    "project_config_scope": "project-local .codex/config.toml",
+    "mcp_entry_has_absolute_cwd": true,
+    "mcp_entry_has_project_argument": false,
+    "mcp_entry_has_environment": false,
+    "provider_unavailable_diagnostic_added_missing_engram_bin_only": true,
+    "user_config_loaded": false,
+    "existing_authentication_used": true,
+    "existing_credentials_copied": false,
+    "existing_settings_plugins_or_hooks_copied": false,
+    "one_off_trust_override_persisted": false,
+    "environment_started_empty": true
+  },
+  "host_cases": [
+    {
+      "id": "registered_project_initial",
+      "expected_project": "naos-engram-memories",
+      "returned_project": "naos-engram-memories",
+      "returned_cwd_state": "exact configured workspace",
+      "project_source": "process_override",
+      "mem_current_project_call_count": 1,
+      "status": "passed"
+    },
+    {
+      "id": "unregistered_project",
+      "expected_outcome": "required MCP startup refusal before model execution",
+      "model_turn_started": false,
+      "provider_processes_after": 0,
+      "client_leases_after": 0,
+      "status": "passed"
+    },
+    {
+      "id": "missing_remote",
+      "expected_outcome": "required MCP startup refusal before model execution",
+      "model_turn_started": false,
+      "provider_processes_after": 0,
+      "client_leases_after": 0,
+      "status": "passed"
+    },
+    {
+      "id": "provider_unavailable",
+      "expected_outcome": "required MCP startup refusal before model execution",
+      "model_turn_started": false,
+      "provider_processes_after": 0,
+      "client_leases_after": 0,
+      "status": "passed"
+    },
+    {
+      "id": "same_basename_second_project",
+      "expected_project": "example-platform",
+      "returned_project": "example-platform",
+      "returned_cwd_state": "exact configured same-basename workspace",
+      "project_source": "process_override",
+      "mem_current_project_call_count": 1,
+      "status": "passed"
+    },
+    {
+      "id": "registered_project_restart_and_recovery",
+      "expected_project": "naos-engram-memories",
+      "returned_project": "naos-engram-memories",
+      "returned_cwd_state": "same exact configured workspace as initial case",
+      "project_source": "process_override",
+      "mem_current_project_call_count": 1,
+      "status": "passed"
+    }
+  ],
+  "protocol_only_cases": [
+    {
+      "id": "linked_worktree",
+      "expected_project": "naos-engram-memories",
+      "returned_project": "naos-engram-memories",
+      "workspace_signal": "process_cwd",
+      "wrapper_resolution_source": "approved_git_remote",
+      "mem_current_project_call_count": 1,
+      "named_codex_host_used": false,
+      "status": "passed"
+    },
+    {
+      "id": "remote_mismatch",
+      "named_codex_host_used": false,
+      "status": "passed_in_shared_synthetic_wrapper_suite"
+    }
+  ],
+  "discarded_diagnostics": [
+    {
+      "id": "untrusted_project_config",
+      "outcome": "Codex did not load the project-local MCP entry and returned unavailable.",
+      "acceptance_credit": false
+    },
+    {
+      "id": "concurrent_three_server_fixture",
+      "outcome": "The required-server startup failed when three Engram MCP children were launched concurrently.",
+      "acceptance_credit": false
+    }
+  ],
+  "post_run": {
+    "codex_fixture_processes": 0,
+    "managed_wrapper_processes": 0,
+    "provider_processes": 0,
+    "production_database_holder_processes": 0,
+    "client_lease_entries": 0
+  },
+  "memory_read": false,
+  "memory_save": false,
+  "runtime_support_claim": false,
+  "disposition": "partial_real_host_evidence_not_promoted",
+  "claim_ceiling": "Codex CLI 0.145.0 on the observed Mac completed registered-project, sequential same-basename multi-project, and fresh-process restart/recovery calls through project-local absolute-cwd MCP entries. It also refused unregistered, missing-remote, and unavailable-provider fixtures at required MCP startup before any model turn. This does not certify Codex Desktop, the IDE extension, concurrent Engram servers, another platform or version, or full Codex runtime support.",
+  "limitations": [
+    "The unregistered, missing-remote, and unavailable-provider host failures were observed as required MCP initialization failures. Codex did not retain the wrapper exit code; the shared deterministic suite separately passed the exact exit-64 and exit-127 contracts.",
+    "The sequential multi-project case used two repositories with the same leaf directory name and distinct approved remotes. The discarded concurrent three-server diagnostic is not acceptance evidence.",
+    "The linked-worktree case completed through the managed wrapper and real provider without the Codex host; linked-worktree host behavior therefore remains partial.",
+    "The shipped Codex adapter has no fixed project argument or environment, so its explicit-project/remote mismatch branch is not reachable as a managed Codex-host case. The mismatch refusal remains deterministic wrapper evidence.",
+    "The run used existing Codex authentication while ignoring user configuration. It did not establish a fresh-authentication profile or inject explicit credential canaries.",
+    "No memory content was read or saved. Desktop, IDE-extension, instruction-following, other-platform, crash, and force-quit behavior remain outside this receipt."
+  ]
+}

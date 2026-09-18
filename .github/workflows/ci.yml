@@ -1,0 +1,118 @@
+name: Verify toolkit
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Provision the declared offline build backend
+        run: python -m pip install --disable-pip-version-check setuptools==80.9.0
+      - name: Verify the build backend is importable
+        run: python -c "import setuptools.build_meta"
+      - name: Run unit tests in an isolated user environment
+        shell: bash
+        run: |
+          export HOME="$RUNNER_TEMP/naos-test-home"
+          mkdir -p "$HOME"
+          unset APPDATA XDG_CONFIG_HOME ENGRAM_DATA_DIR
+          unset NAOS_ENGRAM_MEMORY_CONFIG_DIR NAOS_ENGRAM_MEMORY_BIN_DIR
+          unset NAOS_ENGRAM_MEMORY_TOOL NAOS_ENGRAM_MEMORY_REGISTRY
+          unset NAOS_ENGRAM_MEMORY_LOG NAOS_ENGRAM_MEMORY_PYTHON
+          unset ENGRAM_MEMORY_CONFIG_DIR ENGRAM_MEMORY_BIN_DIR ENGRAM_MEMORY_TOOL
+          unset ENGRAM_MEMORY_REGISTRY ENGRAM_MEMORY_LOG ENGRAM_MEMORY_PYTHON
+          python -m unittest discover -s tests -v
+
+  windows-static-contract:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Provision the declared offline build backend
+        run: python -m pip install --disable-pip-version-check setuptools==80.9.0
+      - name: Verify Python, schema, and policy contracts
+        shell: pwsh
+        env:
+          PYTHONPATH: tests
+        run: |
+          $env:APPDATA = Join-Path $env:RUNNER_TEMP 'appdata'
+          New-Item -ItemType Directory -Force -Path $env:APPDATA | Out-Null
+          python -c "import setuptools.build_meta"
+          python -m compileall -q tools scripts
+          python -m unittest -v `
+            test_mcp_host_acceptance.MCPHostAcceptanceMatrixTests `
+            test_opencode_startup_acceptance.OpenCodeStartupAcceptanceTests.test_trace_requires_exact_startup_methods_argv_tool_and_environment `
+            test_opencode_startup_acceptance.OpenCodeStartupAcceptanceTests.test_tools_call_is_observed_but_never_promoted_by_startup_scope `
+            test_opencode_startup_acceptance.OpenCodeStartupAcceptanceTests.test_homebrew_provenance_is_bound_to_official_tap_and_version `
+            test_opencode_startup_acceptance.OpenCodeStartupAcceptanceTests.test_receipt_schema_is_closed_and_preserves_startup_claim_ceiling `
+            test_opencode_startup_acceptance.OpenCodeStartupAcceptanceTests.test_receipt_semantics_reject_false_success_and_preserve_failure `
+            test_engram_memory.ProjectRegistryTests.test_explicit_client_templates_have_registered_project `
+            test_engram_memory.ProjectRegistryTests.test_client_template_escapes_windows_paths_spaces_and_quotes `
+            test_engram_memory.InventoryAndSanitizationTests.test_catalogue_records_experimental_blockers_and_unsupported_transport `
+            test_engram_memory.InventoryAndSanitizationTests.test_catalogue_rejects_duplicate_ids_bogus_tiers_and_malformed_evidence `
+            test_engram_memory.InventoryAndSanitizationTests.test_vscode_user_config_paths_are_platform_specific `
+            test_engram_memory.ScriptContractTests.test_powershell_setup_uses_verified_shared_interpreter_selection `
+            test_engram_memory.ScriptContractTests.test_powershell_bootstrap_probes_version_before_execution `
+            test_engram_memory.ScriptContractTests.test_powershell_bootstrap_forwards_all_install_choices `
+            test_engram_memory.ScriptContractTests.test_powershell_source_configure_delegates_to_hardened_runtime `
+            test_engram_memory.ScriptContractTests.test_powershell_binary_and_database_maintenance_is_disabled `
+            test_engram_memory.ScriptContractTests.test_powershell_wrapper_does_not_run_provider_diagnostics `
+            test_engram_memory.ScriptContractTests.test_powershell_and_cmd_wrapper_rendering_use_language_literals `
+            test_engram_memory.ScriptContractTests.test_wrapper_passes_validated_project_by_env_and_flag `
+            test_provider.ProviderLifecycleTests.test_windows_mutation_gated_by_approved_asset_like_other_platforms `
+            test_provider.WindowsProviderLifecycleTests.test_windows_process_running_detects_presence_and_absence `
+            test_provider.WindowsProviderLifecycleTests.test_windows_process_running_requires_tasklist `
+            test_provider.WindowsProviderLifecycleTests.test_windows_process_running_fails_closed_on_tasklist_error `
+            test_provider.WindowsProviderLifecycleTests.test_windows_file_locked_detects_missing_and_open_file `
+            test_provider.WindowsProviderLifecycleTests.test_active_engram_use_windows_branch_process_running `
+            test_provider.WindowsProviderLifecycleTests.test_active_engram_use_windows_branch_idle `
+            test_provider.WindowsProviderLifecycleTests.test_extract_binary_zip_installs_single_engram_exe `
+            test_provider.WindowsProviderLifecycleTests.test_extract_binary_zip_rejects_multiple_members_and_unsafe_paths `
+            test_provider.WindowsProviderLifecycleTests.test_provider_status_windows_reports_binary_detection_without_mutation `
+            test_provider.WindowsProviderLifecycleTests.test_adopt_existing_provider_allows_windows_when_supported `
+            test_provider.WindowsProviderLifecycleTests.test_mutate_provider_install_allows_windows_when_supported
+      - name: Parse PowerShell sources without executing them
+        shell: pwsh
+        run: |
+          $files = @(
+            'scripts/bootstrap.ps1',
+            'scripts/setup.ps1',
+            'scripts/engram_mcp_wrapper.ps1'
+          )
+          foreach ($file in $files) {
+            $tokens = $null
+            $parseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path -LiteralPath $file).Path,
+              [ref]$tokens,
+              [ref]$parseErrors
+            ) | Out-Null
+            if ($parseErrors.Count -ne 0) {
+              $parseErrors | ForEach-Object { Write-Error $_.Message }
+              throw "PowerShell parse failed: $file"
+            }
+          }
+
+  unix-script-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: bash -n scripts/setup.sh scripts/engram_mcp_wrapper.sh scripts/engram-memory

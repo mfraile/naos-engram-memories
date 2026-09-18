@@ -1,0 +1,15 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "engram": {
+      "type": "local",
+      "command": [
+        "__ENGRAM_MCP_WRAPPER__"
+      ],
+      "environment": {
+        "ENGRAM_PROJECT": "__ENGRAM_PROJECT__"
+      },
+      "enabled": true
+    }
+  }
+}

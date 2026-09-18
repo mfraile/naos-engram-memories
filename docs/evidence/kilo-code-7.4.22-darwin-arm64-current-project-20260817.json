@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-08-17T22:34:50Z",
+  "executed_at": null,
+  "host": {
+    "outer_application": {
+      "name": "Visual Studio Code",
+      "version": "1.133.0",
+      "sha256": "2c4e000626b3aae4806530191246f9f2bfc9c81f95073c316fb7deba53e0ae75"
+    },
+    "embedded_engine": {
+      "name": "Kilo Code extension",
+      "version": "7.4.22",
+      "sha256": "56236fb823b13a769eb1570cb0736840e5cdabb96003268f96326dca6d22d8a1"
+    },
+    "execution_mode": "desktop_app_embedded_engine"
+  },
+  "platform": {
+    "os": "macos",
+    "os_version": "26.6.1",
+    "os_build": "25G76",
+    "architecture": "arm64"
+  },
+  "provider": {
+    "name": "Engram",
+    "version": "1.20.0",
+    "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+  },
+  "toolkit": {
+    "version": "0.1.0",
+    "source_commit_context": "fc4653a29d4d067617da5b9fa7949f1bd3d75ba8",
+    "source_tree_context": "4cd4eb69c8d845a92ae5ba68f1c67f6bbb497b9a",
+    "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+  },
+  "case": {
+    "target": "registered_canonical_project",
+    "workspace_kind": "registered_git_repository",
+    "workspace_source_commit": "db1e1b5cb2b7300e9052f3353bcbeae5ea8c19ed",
+    "workspace_source_tree": "3f223c74a9d1e847c300d905429ed7a1e9b04797",
+    "workspace_clean_after_run": true,
+    "fixed_project_entry_present": true,
+    "project_mcp_server_enabled": true,
+    "kilo_extension_manifest_sha256": "b8c18eb731169dca613bac656508432dcd6f054d9fc694e18b73d4e9447ff707",
+    "project_config_sha256_before_run": "4b7d02a4703ddd5250296be8bd9291cd33149c0134ed7899a1aa21d4498d77e9",
+    "project_config_sha256_after_run": "363636219a72486452dc35946f04dcd573749bd17f86bc079297e8e22cc36c49",
+    "instruction_file_sha256_after_run": "f9292482fb587775865702dcda5a51947220575c75e04f3346d9e882e9cd8984",
+    "global_kilo_config_unchanged_sha256": "f3fd6a0097623262a1690f64d71ba809d4e02bfa36098986d506cab41792309f"
+  },
+  "observations": {
+    "engram_mcp_server_exposed": true,
+    "mem_current_project_called": true,
+    "expected_project": "naos-engram-memories",
+    "returned_project": "naos-engram-memories",
+    "provider_source": "process_override",
+    "project_path_state": "empty",
+    "available_projects_state": "null",
+    "workspace_signal": "process_cwd",
+    "wrapper_resolution_source": "registered_explicit_project",
+    "incoming_project_signal": "present",
+    "extension_process_cwd_state": "expected_workspace",
+    "wrapper_process_cwd_state": "expected_workspace",
+    "provider_process_cwd_state": "expected_workspace",
+    "provider_probe": "not_run",
+    "other_memory_tools_called": false,
+    "memory_content_accessed": false
+  },
+  "post_response": {
+    "host_processes": 0,
+    "managed_wrapper_processes": 0,
+    "provider_processes": 0,
+    "database_holder_processes": 0,
+    "client_lease_entries": 0
+  },
+  "runtime_support_claim": false,
+  "disposition": "partial_real_host_evidence_not_promoted",
+  "claim_ceiling": "The exact Visual Studio Code application and Kilo Code extension completed one owner-assisted registered-project mem_current_project call through the managed wrapper, and one clean quit was observed. This establishes only that fixed-project workspace case; it does not establish general Kilo support.",
+  "limitations": [
+    "The exact tool-call execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+    "The Visual Studio Code and Kilo Code executable identities were captured immediately after the session; their files predated the session.",
+    "The disposable workspace was at db1e1b5cb2b7300e9052f3353bcbeae5ea8c19ed during the call, two commits behind its then-current origin/main; the managed wrapper hash binds the installed runtime used for the call.",
+    "Kilo added its standard $schema field to the ignored project configuration during startup; the toolkit verifier and repeated dry-run still classified the resulting entry as valid and already configured.",
+    "The project-local configuration supplied the expected registered project explicitly; this observation does not establish dynamic project discovery.",
+    "No model-provider, account, subscription, or credential state was inspected or inferred.",
+    "No memory content was read or saved; memory read/write correctness was not tested.",
+    "Comment-bearing JSONC, unregistered, missing-remote, explicit-mismatch, registry-collision, provider-unavailable, multi-project, clean-profile, credential-isolation, instruction-lifecycle, restart, and other-platform cases remain unrun.",
+    "The post-response probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+  ]
+}

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Legacy source-checkout launcher; installed users use naos-engram-memory.
+set -euo pipefail
+if [[ -n "${ENGRAM_MEMORY_CONFIG_DIR:-}${ENGRAM_MEMORY_PYTHON:-}" ]]; then
+  printf '%s\n' '[error] legacy ENGRAM_MEMORY_* variable detected; use NAOS_ENGRAM_MEMORY_* after explicit migration' >&2
+  exit 64
+fi
+NAOS_ENGRAM_MEMORY_CONFIG_DIR="${NAOS_ENGRAM_MEMORY_CONFIG_DIR:-${XDG_CONFIG_HOME:-${HOME}/.config}/naos-engram-memory}"
+PYTHON_EXECUTABLE="${NAOS_ENGRAM_MEMORY_PYTHON:-__PYTHON_EXECUTABLE__}"
+if [[ "$PYTHON_EXECUTABLE" == "__PYTHON_EXECUTABLE__" ]]; then PYTHON_EXECUTABLE="$(command -v python3 || true)"; fi
+[[ -n "$PYTHON_EXECUTABLE" && -x "$PYTHON_EXECUTABLE" ]] || { printf '[error] Python 3.10+ is required\n' >&2; exit 127; }
+exec "$PYTHON_EXECUTABLE" "${NAOS_ENGRAM_MEMORY_CONFIG_DIR}/engram_memory.py" \
+  --registry "${NAOS_ENGRAM_MEMORY_CONFIG_DIR}/projects.json" "$@"

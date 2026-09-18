@@ -1,0 +1,27 @@
+{
+  "checks": {
+    "dynamic_workspace_resolution": "passed",
+    "host_connected_mcp_server": "passed",
+    "mcp_tool_call_mem_current_project": "passed",
+    "registered_canonical_project": "passed",
+    "memory_read_or_save": "not_performed",
+    "unregistered_project": "not_run_in_real_host",
+    "remote_mismatch": "not_run_in_real_host",
+    "provider_unavailable": "not_run_in_real_host",
+    "several_projects_isolated": "not_run_in_real_host"
+  },
+  "disposition": "partial_real_host_evidence_not_promoted",
+  "engram_version": "engram 1.20.0",
+  "executed_at": "2026-08-13T14:09:48.812000+00:00",
+  "expected_project": "example-product",
+  "host": "Claude Code",
+  "host_version": "2.1.227",
+  "limitations": [
+    "Only the registered dynamic-project case ran through the named host; the remaining real-host negative cases are still required.",
+    "Strict MCP configuration and no session persistence were used, but the process loaded the operator's existing authentication, hooks, and plugins.",
+    "This does not certify the Claude desktop app, VS Code extension shell, Ubuntu, or another version."
+  ],
+  "platform": "darwin_arm64",
+  "schema_version": 1,
+  "synthetic_project": true
+}

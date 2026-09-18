@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "engram": {
+      "command": "__ENGRAM_MCP_WRAPPER__",
+      "args": [],
+      "env": {"ENGRAM_PROJECT": "__ENGRAM_PROJECT__"}
+    }
+  }
+}

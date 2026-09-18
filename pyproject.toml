@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "naos-engram-memories"
+version = "1.0.0"
+description = "Local-only, project-scoped Engram onboarding and administration"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE.md"]
+authors = [{name = "NAOS contributors"}]
+dependencies = []
+
+[project.scripts]
+naos-engram-memory = "tools.engram_memory:main"
+naos-engram-memory-bootstrap = "scripts.bootstrap:main"
+
+[tool.setuptools]
+packages = ["tools", "scripts"]
+include-package-data = true
+
+[tool.setuptools.data-files]
+"share/naos-engram-memory/config" = [
+  "config/projects.json", "config/release-support.json", "config/mcp-hosts.v1.json",
+  "config/mcp-host-observations.v1.json", "config/bootstrap-assets.v1.json",
+]
+"share/naos-engram-memory/config/schemas" = [
+  "config/schemas/mcp-host-acceptance-report.v1.schema.json",
+  "config/schemas/mcp-host-observations.v1.schema.json",
+  "config/schemas/mcp-host-startup-receipt.v1.schema.json",
+]
+"share/naos-engram-memory/clients" = [
+  "clients/antigravity.mcp.json", "clients/claude-code.mcp.json", "clients/codex.mcp.toml",
+  "clients/cursor.mcp.json", "clients/kilo.mcp.json", "clients/muse.mcp.json",
+  "clients/opencode.mcp.json", "clients/project-engram-config.json",
+  "clients/vscode-generic.mcp.json",
+]
+"share/naos-engram-memory/instructions" = ["instructions/engram-project-lifecycle.md"]
+"share/naos-engram-memory/scripts" = [
+  "scripts/bootstrap.py", "scripts/bootstrap.sh", "scripts/bootstrap.ps1",
+  "scripts/engram-memory", "scripts/engram_mcp_wrapper.sh", "scripts/engram_mcp_wrapper.ps1",
+  "scripts/setup.sh", "scripts/setup.ps1",
+]

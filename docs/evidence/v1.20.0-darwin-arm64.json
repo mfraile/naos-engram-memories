@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "candidate": {
+    "version": "1.20.0",
+    "platform": "darwin_arm64",
+    "asset": "engram_1.20.0_darwin_arm64.tar.gz",
+    "sha256": "2363d5012f23e58878f86c3ddcc1f63cfe9dcf3eec7f413e70eaafcbb9d394cc",
+    "release_url": "https://github.com/Gentleman-Programming/engram/releases/tag/v1.20.0"
+  },
+  "executed_at": "2026-08-11T08:59:46.440180+00:00",
+  "environment": {
+    "storage": "disposable ENGRAM_DATA_DIR",
+    "content": "synthetic only",
+    "baseline_binary": "1.15.1",
+    "candidate_binary": "1.20.0"
+  },
+  "checks": {
+    "baseline_database": "passed",
+    "baseline_migration": "passed",
+    "current_project_with_project_flag": "passed",
+    "current_project_with_environment_override": "passed",
+    "project_scoped_context": "passed",
+    "project_scoped_save": "passed",
+    "synthetic_retrieval": "passed",
+    "session_summary": "passed",
+    "concurrent_local_mcp_clients": "passed",
+    "local_operation_without_cloud_service": "passed",
+    "manifest_pinned_install": "passed",
+    "retained_binary_rollback": "passed"
+  },
+  "disposition": "supported for darwin_arm64 only",
+  "limitations": [
+    "This is not evidence for Windows, Linux, or macOS AMD64 assets.",
+    "This is not enterprise IAM, server-grant, cloud-service, or production-data validation.",
+    "A live database upgrade still requires an explicit maintenance window and local backup."
+  ]
+}

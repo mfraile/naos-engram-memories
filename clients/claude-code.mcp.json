@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "engram": {
+      "command": "__ENGRAM_MCP_WRAPPER__",
+      "args": []
+    }
+  }
+}

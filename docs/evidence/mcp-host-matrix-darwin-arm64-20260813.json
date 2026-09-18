@@ -1,0 +1,37 @@
+{
+  "catalogue_hosts": 16,
+  "combination_cells": 80,
+  "disposition": "classified_not_promoted",
+  "executed_at": "2026-08-13T14:20:00+00:00",
+  "host_inventory": {
+    "antigravity": "binary_unavailable",
+    "anythingllm": "not_applicable",
+    "claude-code": "2.1.227",
+    "codex": "0.145.0",
+    "codex-vscode": "not_applicable_alias",
+    "cursor": "binary_unavailable",
+    "kilo": "binary_unavailable",
+    "lm-studio": "not_applicable_to_cli_inventory",
+    "muse": "0.1.0",
+    "ollama": "0.32.6_provider_role_only",
+    "open-design": "not_applicable_server_role",
+    "open-webui": "not_applicable_transport",
+    "opencode-v1": "1.18.15",
+    "opencode-v2": "opencode2_binary_unavailable",
+    "openrouter": "not_applicable_provider_role",
+    "vscode-generic": "1.132.1"
+  },
+  "limitations": [
+    "CLI inventory is not host-runtime acceptance.",
+    "The disposable inventory profile did not forward credentials or read live client configuration.",
+    "Separate partial real-host reports exist for one Codex and one Claude Code registered-project call."
+  ],
+  "platform": "darwin_arm64",
+  "required_scenarios": {
+    "passed": 8,
+    "total": 8
+  },
+  "runtime_support_claims": 0,
+  "schema_version": 1,
+  "synthetic_only": true
+}

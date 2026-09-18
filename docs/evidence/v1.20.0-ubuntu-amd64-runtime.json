@@ -1,0 +1,33 @@
+{
+  "checks": {
+    "clone_free_wheel_install": "passed",
+    "durable_user_runtime": "passed",
+    "installed_asset_integrity": "passed",
+    "offline_wheel_build": "passed",
+    "unregistered_project_fails_closed": "passed",
+    "wrapper_current_project": "passed",
+    "wrapper_mcp_initialize": "passed",
+    "wrapper_tools_list": "passed"
+  },
+  "disposition": "runtime_validated_host_clients_not_promoted",
+  "engram_asset_sha256": "7dc3003318e303bee269a4772144f3ce01c8ec700bfd524aaec76770acd389ca",
+  "engram_version": "engram 1.20.0",
+  "executed_at": "2026-08-13T14:43:15.240664+00:00",
+  "limitations": [
+    "This validates the provider and installed stdio wrapper, not a named GUI or coding-agent host.",
+    "No live memory database, real client configuration, cloud transport, or production project was used.",
+    "Linux AMD64 provider lifecycle support passed; each named Ubuntu GUI or coding-agent host remains separately experimental or unpromoted until its own acceptance gate passes."
+  ],
+  "platform": {
+    "architecture": "x86_64",
+    "container_base": "ubuntu:24.04",
+    "container_network": "disabled",
+    "image_id": "sha256:974bc2dacc6808b54e577c9a30bbdfc8ac4e95c8434a51703f0b21fefa2744d4",
+    "system": "Linux"
+  },
+  "python": "3.12.3",
+  "schema_version": 1,
+  "synthetic_only": true,
+  "toolkit_version": "0.1.0",
+  "wheel_sha256": "d42228170e62d409cc6e02ad076d35873dfead61b6230ff0fb0ab54e18ca9c80"
+}

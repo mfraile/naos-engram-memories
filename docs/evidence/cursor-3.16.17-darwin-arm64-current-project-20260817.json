@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-08-17T20:00:17Z",
+  "executed_at": null,
+  "host": {
+    "outer_application": {
+      "name": "Cursor",
+      "version": "3.16.17",
+      "sha256": "2f66191d6b2332772997081f93c217cb2a623511dc0f19bd458ec43f49490078"
+    },
+    "embedded_engine": {
+      "name": "Cursor MCP extension",
+      "version": "0.0.1",
+      "sha256": "04b40a1de2ce5c93a74cb2f236747494def0476f6f91da7ad223ff43f71acd82"
+    },
+    "execution_mode": "desktop_app_embedded_engine"
+  },
+  "platform": {
+    "os": "macos",
+    "os_version": "26.6.1",
+    "os_build": "25G76",
+    "architecture": "arm64"
+  },
+  "provider": {
+    "name": "Engram",
+    "version": "1.20.0",
+    "sha256": "cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a"
+  },
+  "toolkit": {
+    "version": "0.1.0",
+    "source_commit_context": "9b2bd99f948dbdf8eab38280c45fcb4e7c84ba23",
+    "source_tree_context": "2e9e0a2f785a70707450551678653d7f4c71ed27",
+    "installed_wrapper_sha256": "7dfdcb94b582e658894664ba47ef6246c8b47d6eb65eb37e9a04872908921a07"
+  },
+  "case": {
+    "target": "registered_canonical_project",
+    "workspace_kind": "generated_git_worktree",
+    "workspace_clean_after_run": true,
+    "project_mcp_server_initially_enabled": false,
+    "owner_enabled_server_before_call": true,
+    "fixed_project_entry_present": true
+  },
+  "observations": {
+    "engram_mcp_server_exposed": true,
+    "mem_current_project_called": true,
+    "expected_project": "naos-engram-memories",
+    "returned_project": "naos-engram-memories",
+    "provider_source": "process_override",
+    "project_path_state": "empty",
+    "available_projects_state": "null",
+    "workspace_signal": "process_cwd",
+    "wrapper_resolution_source": "registered_explicit_project",
+    "incoming_project_signal": "present",
+    "provider_probe": "not_run",
+    "other_memory_tools_called": false,
+    "memory_content_accessed": false
+  },
+  "post_response": {
+    "cursor_processes": 0,
+    "managed_wrapper_processes": 0,
+    "provider_processes": 0,
+    "database_holder_processes": 0,
+    "client_lease_entries": 0
+  },
+  "runtime_support_claim": false,
+  "disposition": "partial_real_host_evidence_not_promoted",
+  "claim_ceiling": "The exact Cursor application and embedded MCP extension completed one owner-assisted registered-project mem_current_project call after the owner enabled the project MCP server. This establishes only that one fixed-project workspace case; it does not establish general Cursor support.",
+  "limitations": [
+    "The exact tool-call execution timestamp was not retained; recorded_at is the later evidence-capture time on the same date.",
+    "The Cursor application and embedded MCP extension identities were captured from the installed application immediately after the session; their files predated the session.",
+    "The project MCP server was initially disabled and required explicit owner enablement before the call.",
+    "The project-local configuration supplied the expected registered project explicitly; this observation does not establish dynamic project discovery.",
+    "No model-provider, account, subscription, or credential state was inspected or inferred.",
+    "No memory content was read or saved; memory read/write correctness was not tested.",
+    "Unregistered, missing-remote, explicit-mismatch, registry-collision, provider-unavailable, multi-project, clean-profile, credential-isolation, instruction-lifecycle, restart, and other-platform cases remain unrun.",
+    "The post-response probes are point-in-time evidence and do not establish crash, force-quit, or universal lifecycle behavior."
+  ]
+}

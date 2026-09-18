@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "description": "Synthetic example registry. Replace every entry with reviewed organization-owned canonical project identities before use.",
+  "projects": [
+    {
+      "id": "example-product",
+      "remotes": [
+        "https://github.com/example-org/example-product.git"
+      ],
+      "aliases": [
+        "sample-product"
+      ]
+    },
+    {
+      "id": "example-platform",
+      "remotes": [
+        "https://github.com/example-org/example-platform.git"
+      ],
+      "aliases": []
+    }
+  ]
+}
