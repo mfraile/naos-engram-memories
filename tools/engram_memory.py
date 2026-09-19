@@ -19,8 +19,10 @@ import os
 import re
 import shlex
 import shutil
+import site
 import subprocess
 import sys
+import sysconfig
 import tempfile
 from urllib.parse import urlsplit
 from pathlib import Path
@@ -47,11 +49,54 @@ class EngramMemoryError(ValueError):
 
 
 TOOLKIT_NAMESPACE = "naos-engram-memory"
-TOOLKIT_VERSION = "1.0.0"
+TOOLKIT_VERSION = "1.0.1"
 LEGACY_NAMESPACE = "engram-memory"
 ROOT = Path(__file__).resolve().parents[1]
 INSTALLED_DIR = Path(__file__).resolve().parent
-SHARE_DIR = Path(sys.prefix) / "share" / TOOLKIT_NAMESPACE
+
+
+def resource_data_roots() -> tuple[Path, ...]:
+    """Return every install-scheme data root that may hold packaged resources.
+
+    Packaged ``data_files`` land under the *active install scheme's* data root.
+    That is ``sys.prefix`` only for a virtual environment or pipx; a ``--user``,
+    ``--target``, or ``--prefix`` install places them somewhere else entirely.
+    Assuming ``sys.prefix`` made every registry-backed command fail closed on
+    those layouts, so each supported scheme is probed in a deterministic order.
+    """
+    candidates: list[Path] = []
+
+    def remember(value: str | os.PathLike[str] | None) -> None:
+        if not value:
+            return
+        path = Path(value)
+        if path not in candidates:
+            candidates.append(path)
+
+    remember(sys.prefix)  # virtual environment, pipx
+    remember(sysconfig.get_path("data"))  # distribution schemes such as /usr/local
+    try:
+        remember(site.getuserbase())  # pip install --user
+    except (AttributeError, OSError):  # pragma: no cover - defensive
+        pass
+    remember(sys.base_prefix)
+    remember(ROOT)  # pip install --target
+    # A scheme root that contains site-packages as <root>/lib/pythonX.Y/site-packages.
+    for ancestor in list(INSTALLED_DIR.parents)[:4]:
+        remember(ancestor)
+    return tuple(candidates)
+
+
+def resolved_share_dir() -> Path:
+    """Return the packaged resource root, preferring one that actually exists."""
+    for root in resource_data_roots():
+        candidate = root / "share" / TOOLKIT_NAMESPACE
+        if (candidate / "config" / "projects.json").is_file():
+            return candidate
+    return Path(sys.prefix) / "share" / TOOLKIT_NAMESPACE
+
+
+SHARE_DIR = resolved_share_dir()
 RESOURCE_CONFIG_DIR = (
     INSTALLED_DIR
     if (INSTALLED_DIR / "projects.json").exists()
@@ -66,7 +111,15 @@ TEMPLATE_DIR = (
     if (SHARE_DIR / "clients").exists()
     else ROOT / "clients"
 )
-RESOURCE_SCRIPT_DIR = SHARE_DIR / "scripts" if (SHARE_DIR / "scripts").exists() else ROOT / "scripts"
+RESOURCE_SCRIPT_DIR = (
+    # The wheel also ships the scripts beside the package in purelib, so accept
+    # that sibling directory the way the config and template roots already do.
+    INSTALLED_DIR.parent / "scripts"
+    if (INSTALLED_DIR.parent / "scripts" / "engram_mcp_wrapper.sh").is_file()
+    else SHARE_DIR / "scripts"
+    if (SHARE_DIR / "scripts").exists()
+    else ROOT / "scripts"
+)
 
 
 def user_config_dir(home: Path | None = None) -> Path:
@@ -206,7 +259,17 @@ def load_json(path: Path) -> dict[str, Any]:
 def bundled_config_path(name: str) -> Path:
     path = RESOURCE_CONFIG_DIR / name
     if not path.exists():
-        raise EngramMemoryError(f"bundled toolkit resource is missing: {name}")
+        # Name the roots that were probed. The usual cause is an install whose
+        # data scheme differs from every searched root, so the operator needs to
+        # see where the toolkit looked rather than only which file was absent.
+        searched = ", ".join(str(root / "share" / TOOLKIT_NAMESPACE) for root in resource_data_roots())
+        raise EngramMemoryError(
+            f"bundled toolkit resource is missing: {name}; "
+            f"resolved resource directory {RESOURCE_CONFIG_DIR} does not contain it. "
+            f"Searched packaged roots: {searched}. "
+            "Reinstall the exact toolkit package with 'pipx install naos-engram-memories' "
+            "or 'python3 -m pip install --user naos-engram-memories'"
+        )
     return path
 
 
@@ -229,10 +292,33 @@ def read_config(path: Path, *, default_name: str | None = None) -> dict[str, Any
     return load_json(path)
 
 
+# The symlink refusal is deliberate and stays unchanged, but two of its labels
+# describe environment-derived paths the operator can actually correct. Name the
+# remedy there so a symlinked home or configuration root is recoverable instead
+# of being an unexplained dead end.
+SYMLINK_REMEDIATION = {
+    "user home directory": (
+        '; rerun with HOME set to its resolved physical path, for example '
+        'HOME="$(cd "$HOME" && pwd -P)"'
+    ),
+    # Verified distinction: NAOS_ENGRAM_MEMORY_CONFIG_DIR recovers a symlinked
+    # configuration directory under a real home, but it cannot recover a
+    # symlinked home, because the home check runs independently of it.
+    "configuration path": (
+        "; if only the configuration directory is a symbolic link, set "
+        "NAOS_ENGRAM_MEMORY_CONFIG_DIR to a path whose every component is real; if the home "
+        'directory itself is a symbolic link, rerun with HOME set to its resolved physical '
+        'path, for example HOME="$(cd "$HOME" && pwd -P)"'
+    ),
+}
+
+
 def reject_symlink(path: Path, *, label: str) -> None:
     """Fail closed for existing or broken symbolic links before any read/write."""
     if path.is_symlink():
-        raise EngramMemoryError(f"{label} must not be a symbolic link")
+        raise EngramMemoryError(
+            f"{label} must not be a symbolic link{SYMLINK_REMEDIATION.get(label, '')}"
+        )
 
 
 def reject_symlinks_beneath(base: Path, target: Path, *, label: str) -> None:
@@ -1922,6 +2008,15 @@ def main(argv: list[str] | None = None) -> int:
     provider_adopt_parser.add_argument("--path", required=True)
     provider_adopt_parser.add_argument("--home", type=Path, default=Path.home(), help=argparse.SUPPRESS)
     provider_adopt_parser.add_argument("--platform", help=argparse.SUPPRESS)
+    provider_adopt_parser.add_argument(
+        "--allow-unvalidated-platform",
+        action="store_true",
+        help=(
+            "bind an already-installed provider on a platform with no allowlisted asset; "
+            "the approved version and SHA-256 binding still apply and provider install, "
+            "upgrade, and rollback remain unavailable there"
+        ),
+    )
     provider_adopt_parser.add_argument("--yes", action="store_true")
     provider_adopt_parser.add_argument("--dry-run", action="store_true")
     provider_verify_parser = provider_commands.add_parser("verify-bound", help=argparse.SUPPRESS)
@@ -1940,10 +2035,17 @@ def main(argv: list[str] | None = None) -> int:
     project_parser = subparsers.add_parser("project", help="manage the canonical project registry")
     project_commands = project_parser.add_subparsers(dest="project_command", required=True)
     register_parser = project_commands.add_parser("register", help="register an explicit project and remote")
-    register_parser.add_argument("--id")
-    register_parser.add_argument("--remote")
-    register_parser.add_argument("--from-remote", type=Path)
-    register_parser.add_argument("--alias", action="append", default=[])
+    register_parser.add_argument("--id", help="canonical project ID to register (lowercase, dot/dash/underscore)")
+    register_parser.add_argument("--remote", help="approved credential-free Git remote to associate with --id")
+    register_parser.add_argument(
+        "--from-remote",
+        type=Path,
+        help=(
+            "read this workspace's Git origin and propose the repository component as the ID; "
+            "never the folder name. An already-registered remote keeps its existing project ID"
+        ),
+    )
+    register_parser.add_argument("--alias", action="append", default=[], help="additional alias for the project (repeatable)")
     register_parser.add_argument("--dry-run", action="store_true")
     register_parser.add_argument("--yes", action="store_true")
     register_parser.add_argument("--non-interactive", action="store_true")
@@ -1988,9 +2090,20 @@ def main(argv: list[str] | None = None) -> int:
     instruction_install.add_argument("--non-interactive", action="store_true")
 
     resolve_parser = subparsers.add_parser("resolve", help="resolve one canonical project without writing")
-    resolve_parser.add_argument("--project")
-    resolve_parser.add_argument("--remote")
-    resolve_parser.add_argument("--cwd", type=Path)
+    resolve_parser.add_argument(
+        "--project",
+        help="registered canonical project ID or alias (not a filesystem path, unlike 'onboard --project')",
+    )
+    resolve_parser.add_argument("--remote", help="approved Git remote URL to resolve instead of reading a workspace")
+    resolve_parser.add_argument(
+        "--cwd",
+        type=Path,
+        # Without a default, a bare "resolve" inspected no directory at all and
+        # still reported that no approved Git remote was available. "inventory"
+        # already defaults to the process directory; match it.
+        default=Path.cwd(),
+        help="workspace whose Git origin is read (default: the current directory)",
+    )
 
     render_parser = subparsers.add_parser("render-client", help="render a managed client adapter")
     render_parser.add_argument(
@@ -2050,7 +2163,9 @@ def main(argv: list[str] | None = None) -> int:
     asset_parser.add_argument("--support-manifest", type=Path, default=DEFAULT_SUPPORT)
     asset_parser.add_argument("--platform", required=True)
 
-    validate_path_parser = subparsers.add_parser("validate-path", help=argparse.SUPPRESS)
+    # argparse does not honour argparse.SUPPRESS for a subparser help string; it
+    # renders the sentinel literally in --help. Omit the kwarg instead.
+    validate_path_parser = subparsers.add_parser("validate-path")
     validate_path_parser.add_argument("--path", type=Path, required=True)
 
     args = parser.parse_args(argv)
@@ -2172,6 +2287,7 @@ def main(argv: list[str] | None = None) -> int:
                     selected_platform=args.platform,
                     yes=False,
                     dry_run=True,
+                    allow_unvalidated_platform=args.allow_unvalidated_platform,
                 )
                 selected_provider = Path(adoption_preview["provider_path"])
                 current_runtime = runtime_configuration_state(args.home)
@@ -2196,6 +2312,7 @@ def main(argv: list[str] | None = None) -> int:
                         selected_platform=args.platform,
                         yes=args.yes,
                         dry_run=False,
+                        allow_unvalidated_platform=args.allow_unvalidated_platform,
                     )
                     try:
                         provider_result["runtime"] = ensure_user_runtime(
@@ -2229,7 +2346,27 @@ def main(argv: list[str] | None = None) -> int:
                 except EngramMemoryError:
                     existing = None
                 if existing:
-                    print(json.dumps({"project": existing["id"], "status": "already_registered", "changed": False, "proposal_source": "approved_git_remote"}, indent=2, sort_keys=True))
+                    # A remote legitimately maps to exactly one canonical project,
+                    # so this stays idempotent and successful. Report explicitly
+                    # when a requested --id was not the one recorded, instead of
+                    # returning a different project as a bare success.
+                    payload = {
+                        "project": existing["id"],
+                        "status": "already_registered",
+                        "changed": False,
+                        "proposal_source": "approved_git_remote",
+                    }
+                    requested = args.id or proposal["project"]
+                    if requested.casefold() != existing["id"].casefold():
+                        payload["requested_id"] = requested
+                        payload["requested_id_honoured"] = False
+                        print(
+                            f"naos-engram-memory: this remote is already registered as "
+                            f"{existing['id']!r}; the requested identifier {requested!r} was not "
+                            "applied because one approved remote maps to one canonical project",
+                            file=sys.stderr,
+                        )
+                    print(json.dumps(payload, indent=2, sort_keys=True))
                     return 0
                 project_id = args.id or proposal["project"]
                 remote = args.remote or proposal["remote"]
