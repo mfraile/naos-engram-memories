@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -44,7 +45,27 @@ def main() -> int:
     parser.add_argument("--timeout", type=int, default=15)
     args = parser.parse_args()
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-    print(json.dumps(assess(manifest, latest_tag(args.api_url, args.timeout)), indent=2, sort_keys=True))
+    try:
+        tag = latest_tag(args.api_url, args.timeout)
+    except (urllib.error.URLError, OSError, ValueError, json.JSONDecodeError) as exc:
+        # This runs on a schedule against an unauthenticated GitHub endpoint, so
+        # a rate limit, outage, or offline runner is expected. Report it as data
+        # and never as a traceback; the manifest is deliberately left unchanged.
+        reason = f"HTTP {exc.code}" if isinstance(exc, urllib.error.HTTPError) else str(exc) or type(exc).__name__
+        print(
+            json.dumps(
+                {
+                    "status": "upstream_check_unavailable",
+                    "reason": reason,
+                    "manifest_changed": False,
+                    "action": "retry_the_release_policy_check",
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 2
+    print(json.dumps(assess(manifest, tag), indent=2, sort_keys=True))
     return 0
 
 

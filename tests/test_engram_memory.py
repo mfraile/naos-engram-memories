@@ -8,17 +8,37 @@ import io
 import json
 import os
 import shutil
+import site
 import subprocess
 import sys
+import sysconfig
 import tempfile
+import types
 import unittest
 import unittest.mock
 import zipfile
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SYNTHETIC_REGISTRY = ROOT / "tests" / "fixtures" / "projects.synthetic.json"
+
+
+class WindowsOsShim:
+    """Expose the real ``os`` API with ``name`` forced to ``"nt"``.
+
+    Patching ``os.name`` on the shared module object also reroutes
+    ``pathlib.Path`` to ``WindowsPath``, which cannot be instantiated on POSIX
+    under Python 3.10 and 3.11 and made this suite fail on the declared minimum
+    interpreter. Only the module under test needs to observe ``"nt"``, so scope
+    the override to its own ``os`` reference and delegate everything else.
+    """
+
+    name = "nt"
+
+    def __getattr__(self, attribute: str):
+        return getattr(os, attribute)
 
 
 def load_module(name: str, path: Path):
@@ -2332,13 +2352,16 @@ class ScriptContractTests(unittest.TestCase):
                     self.assertIn("NAOS_ENGRAM_MEMORY_CONFIG_DIR=", wrapper_text)
 
     def test_powershell_and_cmd_wrapper_rendering_use_language_literals(self) -> None:
-        config = Path("C:/Program Files/NAOS/O'Brien")
+        # Concrete Windows paths are built with the pure flavour so no
+        # WindowsPath is instantiated on POSIX; rendered_wrapper_assets already
+        # preserves the caller's path flavour for its targets.
+        config = PureWindowsPath("C:/Program Files/NAOS/O'Brien")
         with (
-            unittest.mock.patch.object(memory.os, "name", "nt"),
+            unittest.mock.patch.object(memory, "os", WindowsOsShim()),
             unittest.mock.patch.object(memory, "RESOURCE_SCRIPT_DIR", ROOT / "scripts"),
             unittest.mock.patch.object(memory.provider_lifecycle, "configured_provider_path", side_effect=lambda _config, default: default),
         ):
-            assets = memory.rendered_wrapper_assets(config, Path("C:/fixture/bin"))
+            assets = memory.rendered_wrapper_assets(config, PureWindowsPath("C:/fixture/bin"))
         ps = assets["engram-mcp-wrapper.ps1"][1]
         cmd = assets["engram-mcp-wrapper.cmd"][1]
         self.assertIn("O''Brien", ps)
@@ -2442,7 +2465,8 @@ class ScriptContractTests(unittest.TestCase):
             )
             self.assertEqual(0, rendered.returncode, rendered.stderr)
             self.assertIn(memory.INSTRUCTION_BEGIN, rendered.stdout)
-            metadata = next((venv / "lib").rglob("naos_engram_memories-1.0.0.dist-info/METADATA"))
+            # Match any version so a bump cannot break this contract test.
+            metadata = next((venv / "lib").rglob("naos_engram_memories-*.dist-info/METADATA"))
             self.assertIn("Name: naos-engram-memories", metadata.read_text(encoding="utf-8"))
             home = root / "home"
             config_home = home / ".config"
@@ -2563,7 +2587,36 @@ class ScriptContractTests(unittest.TestCase):
         self.assertIn("legacy toolkit config detected", windows_wrapper)
         self.assertNotIn("Add-Content", windows_wrapper)
         self.assertNotIn(">> \"$NAOS_ENGRAM_MEMORY_LOG\"", wrapper)
-        self.assertIn("Toolkit path overrides are not accepted", windows_wrapper)
+        # Write-Error is a terminating error under $ErrorActionPreference='Stop',
+        # so an early guard that used it never reached its own exit code and the
+        # host reported 1 instead of the documented 64. Pin the Stop-Wrapper
+        # idiom, which writes to stderr and exits with the intended code.
+        for guard in (
+            "Stop-Wrapper 'ERROR cloud/autosync environment is unsupported by this locked local-only wrapper' 64",
+            "Stop-Wrapper 'ERROR toolkit path overrides are not accepted by the installed MCP wrapper' 64",
+            "Stop-Wrapper 'ERROR custom ENGRAM_DATA_DIR is unsupported by the managed wrapper in this release' 64",
+        ):
+            self.assertIn(guard, windows_wrapper)
+        executable_lines = [
+            line
+            for line in windows_wrapper.splitlines()
+            if line.strip() and not line.strip().startswith("#")
+        ]
+        self.assertEqual(
+            [],
+            [line for line in executable_lines if "Write-Error" in line],
+            "guards must use Stop-Wrapper so their documented exit codes stay reachable",
+        )
+        # Every existence probe is literal so a path containing [ or ] is not
+        # treated as a wildcard.
+        self.assertEqual(
+            [],
+            [
+                line
+                for line in executable_lines
+                if "Test-Path" in line and "Test-Path -LiteralPath" not in line
+            ],
+        )
 
     def test_runtime_refuses_unmigrated_legacy_config(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -3190,6 +3243,180 @@ class ScriptContractTests(unittest.TestCase):
             self.assertNotEqual(0, result.returncode)
             self.assertIn("symbolic link", result.stderr)
             self.assertEqual("synthetic\n", database_target.read_text(encoding="utf-8"))
+
+
+class InstallLayoutTests(unittest.TestCase):
+    """Packaged resources must resolve for every supported pip install layout."""
+
+    def test_resource_data_roots_cover_each_install_scheme(self) -> None:
+        roots = memory.resource_data_roots()
+        self.assertEqual(len(roots), len(set(roots)), "roots must be de-duplicated")
+        self.assertIn(Path(sys.prefix), roots)
+        self.assertIn(Path(sysconfig.get_path("data")), roots)
+        self.assertIn(Path(site.getuserbase()), roots)
+        # pip install --target places share/ beside the importable package.
+        self.assertIn(memory.ROOT, roots)
+        # A scheme root holding <root>/lib/pythonX.Y/site-packages must be reachable.
+        self.assertIn(memory.INSTALLED_DIR.parents[2], roots)
+
+    def test_share_dir_is_found_under_a_non_prefix_data_root(self) -> None:
+        # pip install --user puts data under site.getuserbase() while sys.prefix
+        # stays /usr, which previously made every registry command fail closed.
+        with tempfile.TemporaryDirectory() as temporary:
+            userbase = Path(temporary) / "userbase"
+            marker = userbase / "share" / memory.TOOLKIT_NAMESPACE / "config" / "projects.json"
+            marker.parent.mkdir(parents=True)
+            marker.write_text('{"schema_version": 1, "projects": []}\n', encoding="utf-8")
+            unrelated = Path(temporary) / "empty-prefix"
+            unrelated.mkdir()
+            with mock.patch.object(
+                memory, "resource_data_roots", return_value=(unrelated, userbase)
+            ):
+                self.assertEqual(marker.parent.parent, memory.resolved_share_dir())
+
+    def test_share_dir_falls_back_to_prefix_when_nothing_matches(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            empty = Path(temporary)
+            with mock.patch.object(memory, "resource_data_roots", return_value=(empty,)):
+                self.assertEqual(
+                    Path(sys.prefix) / "share" / memory.TOOLKIT_NAMESPACE,
+                    memory.resolved_share_dir(),
+                )
+
+    def test_missing_resource_error_names_the_searched_roots(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            with mock.patch.object(memory, "RESOURCE_CONFIG_DIR", Path(temporary)):
+                with self.assertRaises(memory.EngramMemoryError) as caught:
+                    memory.bundled_config_path("projects.json")
+        message = str(caught.exception)
+        self.assertIn("Searched packaged roots:", message)
+        self.assertIn("pipx install", message)
+        self.assertIn("--user", message)
+
+    def test_bootstrap_share_dirs_mirror_the_same_scheme_contract(self) -> None:
+        # bootstrap.py cannot import the CLI, so it keeps its own copy. Both must
+        # probe the same roots or --verify-asset breaks on a --user install.
+        shares = bootstrap.share_dirs()
+        self.assertEqual(len(shares), len(set(shares)))
+        expected = {
+            Path(sys.prefix) / "share" / "naos-engram-memory",
+            Path(sysconfig.get_path("data")) / "share" / "naos-engram-memory",
+            Path(site.getuserbase()) / "share" / "naos-engram-memory",
+        }
+        self.assertTrue(expected.issubset(set(shares)), f"{expected - set(shares)} missing")
+
+
+class CommandSurfaceTests(unittest.TestCase):
+    """User-facing argument and help contracts."""
+
+    def test_help_does_not_leak_the_suppress_sentinel(self) -> None:
+        # argparse renders argparse.SUPPRESS literally for a subparser help.
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "tools" / "engram_memory.py"), "--help"],
+            text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertNotIn("SUPPRESS", result.stdout)
+
+    def test_resolve_defaults_to_the_process_directory(self) -> None:
+        # A bare "resolve" inspected no directory and still claimed no approved
+        # Git remote was available.
+        with tempfile.TemporaryDirectory() as temporary:
+            workspace = Path(temporary) / "workspace"
+            workspace.mkdir()
+            subprocess.run(["git", "-C", str(workspace), "init", "-q"], check=True)
+            subprocess.run(
+                [
+                    "git", "-C", str(workspace), "remote", "add", "origin",
+                    "https://github.com/example-org/example-product.git",
+                ],
+                check=True,
+            )
+            result = subprocess.run(
+                [
+                    sys.executable, str(ROOT / "tools" / "engram_memory.py"),
+                    "--registry", str(SYNTHETIC_REGISTRY), "resolve",
+                ],
+                cwd=workspace, text=True,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+            )
+            self.assertEqual(0, result.returncode, result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("example-product", payload["project"])
+            self.assertEqual("approved_git_remote", payload["source"])
+
+    def test_symlink_refusals_state_a_remediation(self) -> None:
+        self.assertIn("HOME", memory.SYMLINK_REMEDIATION["user home directory"])
+        configuration = memory.SYMLINK_REMEDIATION["configuration path"]
+        self.assertIn("NAOS_ENGRAM_MEMORY_CONFIG_DIR", configuration)
+        self.assertIn("HOME", configuration)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "real"
+            target.mkdir()
+            link = root / "link"
+            link.symlink_to(target)
+            with self.assertRaises(memory.EngramMemoryError) as caught:
+                memory.reject_symlink(link, label="user home directory")
+            self.assertIn("resolved physical path", str(caught.exception))
+            # An unrelated label keeps its original concise message.
+            with self.assertRaises(memory.EngramMemoryError) as other:
+                memory.reject_symlink(link, label="instruction target")
+            self.assertEqual("instruction target must not be a symbolic link", str(other.exception))
+
+    def test_register_reports_an_id_superseded_by_an_existing_remote(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            workspace = root / "workspace"
+            workspace.mkdir()
+            subprocess.run(["git", "-C", str(workspace), "init", "-q"], check=True)
+            subprocess.run(
+                [
+                    "git", "-C", str(workspace), "remote", "add", "origin",
+                    "https://github.com/example-org/example-product.git",
+                ],
+                check=True,
+            )
+            registry = root / "projects.json"
+            shutil.copyfile(SYNTHETIC_REGISTRY, registry)
+            result = subprocess.run(
+                [
+                    sys.executable, str(ROOT / "tools" / "engram_memory.py"),
+                    "--registry", str(registry), "project", "register",
+                    "--id", "a-different-id", "--from-remote", str(workspace), "--yes",
+                ],
+                cwd=workspace, text=True,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+            )
+            self.assertEqual(0, result.returncode, result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("already_registered", payload["status"])
+            self.assertEqual("example-product", payload["project"])
+            self.assertEqual("a-different-id", payload["requested_id"])
+            self.assertFalse(payload["requested_id_honoured"])
+            self.assertIn("was not applied", result.stderr)
+
+
+class OfflineBuildBackendTests(unittest.TestCase):
+    """The offline validation lane must name its own prerequisite."""
+
+    def test_precheck_rejects_a_backend_that_cannot_build_offline(self) -> None:
+        # Distribution-patched setuptools 68.x cannot run bdist_wheel with
+        # --no-build-isolation, which surfaced as an opaque pip traceback.
+        with mock.patch.dict(sys.modules, {"setuptools": types.SimpleNamespace(__version__="68.1.2")}):
+            with self.assertRaises(installed_runtime.RuntimeValidationError) as caught:
+                installed_runtime.assert_offline_build_backend()
+        message = str(caught.exception)
+        self.assertIn("68.1.2", message)
+        self.assertIn("setuptools>=70.1", message)
+
+    def test_precheck_accepts_a_supported_backend(self) -> None:
+        for version in ("70.1", "80.9.0", "84.0.0"):
+            with self.subTest(version=version):
+                with mock.patch.dict(
+                    sys.modules, {"setuptools": types.SimpleNamespace(__version__=version)}
+                ):
+                    installed_runtime.assert_offline_build_backend()
 
 
 if __name__ == "__main__":

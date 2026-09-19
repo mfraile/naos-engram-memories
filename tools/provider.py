@@ -196,14 +196,31 @@ def _atomic_json(path: Path, value: dict[str, Any]) -> None:
         temporary.unlink(missing_ok=True)
 
 
+def _normalized_architecture(raw: str) -> str:
+    value = raw.lower()
+    if value in {"arm64", "aarch64"}:
+        return "arm64"
+    if value in {"x86_64", "amd64"}:
+        return "amd64"
+    return value
+
+
 def platform_key() -> str:
     if os.name == "nt":
-        return "windows_amd64"
+        # Windows must report its real architecture like every other platform.
+        # Returning windows_amd64 unconditionally made an ARM64 host silently
+        # select the x86_64 asset, which no allowlist entry covers. Under WOW64
+        # PROCESSOR_ARCHITECTURE reports the emulated architecture, so prefer
+        # PROCESSOR_ARCHITEW6432 when the process is itself emulated.
+        raw = (
+            os.environ.get("PROCESSOR_ARCHITEW6432")
+            or os.environ.get("PROCESSOR_ARCHITECTURE")
+            or host_platform.machine()
+        )
+        return f"windows_{_normalized_architecture(raw)}"
     operating_system = sys.platform
     operating_system = "darwin" if operating_system == "darwin" else "linux" if operating_system.startswith("linux") else operating_system
-    architecture = host_platform.machine().lower()
-    architecture = "arm64" if architecture in {"arm64", "aarch64"} else "amd64" if architecture in {"x86_64", "amd64"} else architecture
-    return f"{operating_system}_{architecture}"
+    return f"{operating_system}_{_normalized_architecture(host_platform.machine())}"
 
 
 def approved_asset(support: dict[str, Any], selected_platform: str) -> dict[str, str]:
@@ -239,6 +256,38 @@ def approved_asset(support: dict[str, Any], selected_platform: str) -> dict[str,
         "url": f"https://github.com/Gentleman-Programming/engram/releases/download/v{version}/{filename}",
         "platform": selected_platform,
     }
+
+
+def validated_platforms(support: dict[str, Any]) -> list[str]:
+    """Return every platform with an allowlisted asset, for exact error text."""
+    names: set[str] = set()
+    for release in support.get("releases", []):
+        if release.get("status") != "supported":
+            continue
+        for name, entry in (release.get("platforms") or {}).items():
+            if isinstance(entry, dict) and entry.get("status") == "supported":
+                names.add(name)
+    return sorted(names)
+
+
+def supported_release_version(support: dict[str, Any]) -> str:
+    """Return the single supported release version, ignoring platform assets.
+
+    Adoption binds a provider the owner already has, so it needs the approved
+    *version* but not a platform asset or its checksum. This keeps the version
+    pin intact on a platform that has no allowlisted download.
+    """
+    if support.get("schema_version") != 1:
+        raise ProviderError("unsupported release support schema")
+    versions = [
+        release.get("version")
+        for release in support.get("releases", [])
+        if release.get("status") == "supported"
+    ]
+    exact = [version for version in versions if isinstance(version, str) and version]
+    if len(exact) != 1:
+        raise ProviderError("no single supported Engram release version is approved")
+    return exact[0]
 
 
 def _user_config_dir(home: Path) -> Path:
@@ -438,18 +487,37 @@ def adopt_existing_provider(
     selected_platform: str | None = None,
     yes: bool,
     dry_run: bool,
+    allow_unvalidated_platform: bool = False,
 ) -> dict[str, Any]:
     """Explicitly adopt a local provider without copying or replacing it."""
     _reject_custom_data_dir()
     selected_platform = selected_platform or platform_key()
     if not yes and not dry_run:
         raise ProviderError("existing provider adoption requires explicit --yes confirmation")
-    asset = approved_asset(support, selected_platform)
+    # Adoption binds an executable the owner already installed, so a platform
+    # without an allowlisted download asset can still be bound on explicit
+    # request. Only the platform-asset allowlist is bypassed: the approved
+    # version check and the SHA-256 path binding below are unchanged, and
+    # install/upgrade/rollback stay refused because they need a real asset.
+    platform_validation = "allowlisted_asset"
+    try:
+        approved_version = approved_asset(support, selected_platform)["version"]
+    except ProviderError:
+        if not allow_unvalidated_platform:
+            raise ProviderError(
+                f"no single supported Engram release is approved for {selected_platform}; "
+                f"validated platforms are {', '.join(validated_platforms(support))}. "
+                "To bind a provider you already installed on this platform, rerun "
+                "'provider adopt' with --allow-unvalidated-platform --yes; toolkit "
+                "install, upgrade, and rollback remain unavailable there"
+            ) from None
+        approved_version = supported_release_version(support)
+        platform_validation = "unvalidated_owner_approved"
     paths = provider_paths(home, config_dir=config_dir)
     resolved, source, followed_symlink = _resolve_existing_candidate(candidate)
     before_path = resolved
     before_hash = _sha256(resolved)
-    observed_version = _binary_version(resolved, asset["version"])
+    observed_version = _binary_version(resolved, approved_version)
     # Detect candidate retargeting or byte replacement across validation.
     resolved_after, _source_after, _followed_after = _resolve_existing_candidate(candidate)
     if resolved_after != before_path or _sha256(resolved_after) != before_hash:
@@ -463,6 +531,8 @@ def adopt_existing_provider(
             "kind": "adopted_existing",
             "candidate_source": source,
             "symlink_resolved": followed_symlink,
+            "platform": selected_platform,
+            "platform_validation": platform_validation,
         },
     }
     result = {
@@ -475,6 +545,8 @@ def adopt_existing_provider(
         "provider_path": str(resolved),
         "provider_provenance": "adopted_existing",
         "symlink_resolved": followed_symlink,
+        "platform": selected_platform,
+        "platform_validation": platform_validation,
         "provider_executed": True,
         "memory_content_read": False,
         "network_accessed": None,

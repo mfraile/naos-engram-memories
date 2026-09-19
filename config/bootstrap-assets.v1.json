@@ -3,10 +3,10 @@
   "integrity_algorithm": "sha256",
   "release_signing": "optional when the selected profile or an auditor requires it; exact SHA-256 integrity remains mandatory",
   "assets": {
-    "bootstrap.py": "dbf362ba0583d9dafccd2cb3053b6888a1797985bb2db8f9d1d5f0f1195ed14c",
+    "bootstrap.py": "eed8e154224eee8f1be1403c1d60d687b95801bdb53944b0848a89a6bc2c69b0",
     "bootstrap.sh": "952cad6999e512ef7b0bb79c92692654a88acbaa79333ce263f71a2ebb24ceb5",
     "bootstrap.ps1": "fecd60874560dd5ee5bbf7bd763e562397075b81e0b415e2b45eea57f7b788cd",
     "engram_mcp_wrapper.sh": "1e668bdfdfee968adaebc01400cecdb1b88ea485c86b0b0bc6a33dd9b084b86c",
-    "engram_mcp_wrapper.ps1": "428847ecff3f49e2aed7f068114abcaf5a48ad1c93f8bb971baf72c4f7324ff4"
+    "engram_mcp_wrapper.ps1": "4fe69b16af58777d2ed38fba727fa4a8d9c85d00422b0737a0e76ec91b0ec27c"
   }
 }

@@ -12,6 +12,7 @@ import time
 import unittest
 from unittest import mock
 
+from tools import engram_memory as memory
 from tools import provider
 
 
@@ -1246,6 +1247,114 @@ def windows_support_for(archive: Path, version: str) -> dict:
             }},
         }],
     }
+
+
+class PlatformGateTests(unittest.TestCase):
+    """Platform detection and the explicit unvalidated-platform adoption escape."""
+
+    def test_windows_platform_key_reports_real_architecture(self) -> None:
+        # platform_key returned windows_amd64 unconditionally, so an ARM64 host
+        # silently selected the x86_64 asset instead of failing closed.
+        cases = (
+            ({"PROCESSOR_ARCHITECTURE": "AMD64"}, "AMD64", "windows_amd64"),
+            ({"PROCESSOR_ARCHITECTURE": "ARM64"}, "ARM64", "windows_arm64"),
+            # A 32-bit process on an ARM64 host reports x86 in
+            # PROCESSOR_ARCHITECTURE, so the WOW64 variable wins.
+            ({"PROCESSOR_ARCHITECTURE": "x86", "PROCESSOR_ARCHITEW6432": "ARM64"}, "x86", "windows_arm64"),
+            ({}, "ARM64", "windows_arm64"),
+        )
+        for environment, machine, expected in cases:
+            with self.subTest(expected=expected):
+                with (
+                    mock.patch.object(provider.os, "name", "nt"),
+                    mock.patch.dict(provider.os.environ, environment, clear=True),
+                    mock.patch.object(provider.host_platform, "machine", lambda value=machine: value),
+                ):
+                    self.assertEqual(expected, provider.platform_key())
+
+    def test_windows_arm64_has_no_approved_asset_and_fails_closed(self) -> None:
+        support = memory.load_json(memory.bundled_config_path("release-support.json"))
+        self.assertIn("windows_amd64", provider.validated_platforms(support))
+        self.assertNotIn("windows_arm64", provider.validated_platforms(support))
+        with self.assertRaisesRegex(provider.ProviderError, "windows_arm64"):
+            provider.approved_asset(support, "windows_arm64")
+
+    def test_supported_release_version_is_the_single_supported_release(self) -> None:
+        support = memory.load_json(memory.bundled_config_path("release-support.json"))
+        self.assertEqual("1.20.0", provider.supported_release_version(support))
+        with self.assertRaisesRegex(provider.ProviderError, "no single supported"):
+            provider.supported_release_version({"schema_version": 1, "releases": []})
+
+    def test_adopt_refuses_unvalidated_platform_and_names_the_escape(self) -> None:
+        support = memory.load_json(memory.bundled_config_path("release-support.json"))
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            candidate = root / "bin" / "engram"
+            candidate.parent.mkdir()
+            candidate.write_bytes(provider_script("1.20.0"))
+            candidate.chmod(0o755)
+            for unvalidated in ("darwin_amd64", "linux_arm64"):
+                with self.subTest(platform=unvalidated):
+                    with self.assertRaises(provider.ProviderError) as caught:
+                        provider.adopt_existing_provider(
+                            support, candidate=candidate, home=root / "home",
+                            selected_platform=unvalidated, yes=True, dry_run=True,
+                        )
+                    message = str(caught.exception)
+                    self.assertIn("--allow-unvalidated-platform", message)
+                    self.assertIn("darwin_arm64", message)
+
+    def test_adopt_escape_binds_provider_but_keeps_version_and_hash_pins(self) -> None:
+        support = memory.load_json(memory.bundled_config_path("release-support.json"))
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            home = root / "home"
+            config_dir = memory.user_config_dir(home)
+            candidate = root / "bin" / "engram"
+            candidate.parent.mkdir()
+            candidate.write_bytes(provider_script("1.20.0"))
+            candidate.chmod(0o755)
+            result = provider.adopt_existing_provider(
+                support, candidate=candidate, home=home, config_dir=config_dir,
+                selected_platform="linux_arm64", yes=True, dry_run=False,
+                allow_unvalidated_platform=True,
+            )
+            self.assertEqual("adopted", result["status"])
+            self.assertEqual("linux_arm64", result["platform"])
+            self.assertEqual("unvalidated_owner_approved", result["platform_validation"])
+            self.assertEqual("1.20.0", result["installed_version"])
+            state = memory.load_json(config_dir / "provider-state.v1.json")
+            self.assertEqual(
+                hashlib.sha256(candidate.read_bytes()).hexdigest(), state["binary_sha256"]
+            )
+            self.assertEqual("unvalidated_owner_approved", state["provenance"]["platform_validation"])
+            self.assertEqual("linux_arm64", state["provenance"]["platform"])
+
+            # The escape waives only the platform asset allowlist: a binary that
+            # reports a different version is still refused.
+            wrong = root / "wrong" / "engram"
+            wrong.parent.mkdir()
+            wrong.write_bytes(provider_script("1.15.1"))
+            wrong.chmod(0o755)
+            with self.assertRaisesRegex(provider.ProviderError, "manifest-approved version"):
+                provider.adopt_existing_provider(
+                    support, candidate=wrong, home=home, config_dir=config_dir,
+                    selected_platform="linux_arm64", yes=True, dry_run=True,
+                    allow_unvalidated_platform=True,
+                )
+
+    def test_escape_does_not_unlock_download_based_mutation(self) -> None:
+        support = memory.load_json(memory.bundled_config_path("release-support.json"))
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            for operation in ("install", "upgrade", "rollback"):
+                with self.subTest(operation=operation):
+                    with self.assertRaisesRegex(provider.ProviderError, "linux_arm64"):
+                        provider.mutate_provider(
+                            operation, support, home=root / "home",
+                            bin_dir=root / "bin", selected_platform="linux_arm64",
+                            maintenance_window=True, yes=True, dry_run=True,
+                        )
 
 
 @unittest.skipUnless(os.name == "nt", "Windows provider lifecycle tests")

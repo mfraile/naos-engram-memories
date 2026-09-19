@@ -22,19 +22,23 @@ This release exposes only the `local` profile. The `personal` and `team`
 sections are architecture guidance, not enabled transport, cloud, or service
 features; no command in this release configures replication or team access.
 
-The repository is prepared for public release from this fresh history only. It
-must remain private until the sanitization procedure passes, a human review
-approves the staged contents, and the repository visibility is deliberately
-changed. The toolkit source is under the [MIT License](LICENSE); it does not
-bundle an upstream Engram binary or source. See [NOTICE.md](NOTICE.md).
+This repository was published from a fresh history after the sanitization
+procedure passed and a human review approved the staged contents. Re-run
+`python3 tools/sanitize_public_tree.py` before any further publication step. The
+toolkit source is under the [MIT License](LICENSE); it does not bundle an
+upstream Engram binary or source. See [NOTICE.md](NOTICE.md). Because the
+history was rewritten for publication, the checked-in evidence files are not
+reproducible from this tree; see
+[`docs/evidence/README.md`](docs/evidence/README.md) for exactly what each
+record does and does not attest.
 
 ## Friendly local onboarding
 
-The intended public no-clone path, once version `1.0.0` has actually been
+The intended public no-clone path, once version `1.0.1` has actually been
 published, is:
 
 ```bash
-pipx install "naos-engram-memories==1.0.0"
+pipx install "naos-engram-memories==1.0.1"
 naos-engram-memory onboard --project /path/to/registered-workspace
 naos-engram-memory runtime install --yes --non-interactive
 naos-engram-memory provider status
@@ -42,6 +46,11 @@ naos-engram-memory provider status
 
 This repository does **not** claim that package is currently published. For a
 reviewed local checkout, `python3 -m pip install .` is the source-install path.
+`pipx` is preferred, but `python3 -m pip install --user`, `--target`, and
+`--prefix` are supported: packaged resources are located through every install
+scheme's data root rather than assuming `sys.prefix`. On a distribution whose
+Python is externally managed (PEP 668), prefer `pipx` or a virtual environment
+over `--break-system-packages`.
 If Python selection is uncertain, the foreground bootstrap enumerates explicit
 `--python`, configured interpreter, `python3`/`python`, and Windows `py -3`
 candidates, verifies Python 3.10+, and asks before package installation:
@@ -334,10 +343,42 @@ versions the installer may use. The installer never queries or installs
 - v1.15.1 is unsupported because the observed MCP project override was not
   reliable.
 - v1.20.0 provider lifecycle support covers validated macOS ARM64, Ubuntu
-  AMD64, and Windows AMD64 assets. This does not promote any named IDE/AI host;
-  macOS AMD64 remains experimental.
+  AMD64, and Windows AMD64 assets. This does not promote any named IDE/AI host.
 - Release checks occur on demand. An owner explicitly requests every
   supported upgrade during a maintenance window; no background update exists.
+
+### Platform envelope
+
+Platform support is an allowlist, so an unlisted platform fails closed rather
+than downloading an unvalidated asset. The toolkit CLI itself is pure Python and
+runs anywhere Python 3.10+ runs; the table describes the *provider* lifecycle.
+
+| Platform | `provider install`/`upgrade`/`rollback` | `provider adopt` |
+| --- | --- | --- |
+| macOS ARM64 (Apple Silicon) | supported | supported |
+| Linux x86-64 | supported | supported |
+| Windows x86-64 | supported | supported |
+| macOS x86-64 (Intel) | refused — no allowlisted asset | `--allow-unvalidated-platform` |
+| Linux ARM64 / aarch64 | refused — no allowlisted asset | `--allow-unvalidated-platform` |
+| Windows ARM64 | refused — no allowlisted asset | `--allow-unvalidated-platform` |
+| anything else | refused | `--allow-unvalidated-platform` |
+
+On a platform with no allowlisted asset you can still bind an `engram` you
+installed yourself. This is an explicit owner decision, never a default:
+
+```bash
+naos-engram-memory provider adopt --path "$(command -v engram)" --dry-run
+naos-engram-memory provider adopt --path "$(command -v engram)" \
+  --allow-unvalidated-platform --yes
+```
+
+Only the platform-asset allowlist is waived. The approved version check and the
+recorded SHA-256 path binding still apply, the managed wrapper still verifies
+that exact path and hash before every start, and the adoption is recorded as
+`platform_validation: unvalidated_owner_approved`. Toolkit-driven install,
+upgrade, and rollback remain unavailable there, because no verified download
+exists to install. Windows ARM64 is detected as `windows_arm64` and is refused
+rather than silently receiving the x86-64 asset.
 
 After a release is promoted on a supported platform, use the clone-free
 `naos-engram-memory provider ...` commands above. The legacy source-tree
@@ -383,18 +424,50 @@ and [docs/SECURITY.md](docs/SECURITY.md).
 | `tools/run_opencode_startup_acceptance.py` | Pinned real-OpenCode startup and tool-discovery receipt runner |
 | `tools/sanitize_public_tree.py` | Fail-closed public-release staging scan |
 | `docs/` | Architecture, administration, migration, operations, security, and release manuals |
+| `docs/evidence/README.md` | What each retained validation receipt does and does not attest |
 
 ## Validation
 
+The test suite and the installed-runtime probe build a wheel offline with
+`--no-build-isolation`, so they use whatever `setuptools` is already importable.
+**`setuptools>=70.1` is a prerequisite.** The `setuptools` 68.x that Debian and
+Ubuntu ship cannot run `bdist_wheel` in that mode at all, which is a
+distribution packaging defect rather than a fault in this toolkit. Continuous
+integration pins `setuptools==80.9.0`; do the same locally, ideally in a virtual
+environment:
+
+```bash
+python3 -m venv .venv && . .venv/bin/activate
+python3 -m pip install "setuptools==80.9.0"
+```
+
 ```bash
 python3 -m unittest discover -s tests -v
-bash -n scripts/setup.sh scripts/engram_mcp_wrapper.sh
+bash -n scripts/setup.sh scripts/engram_mcp_wrapper.sh scripts/engram-memory
 python3 tools/engram_memory.py release-status
 python3 tools/validate_installed_runtime.py --engram-binary /absolute/path/to/engram
 ```
+
+The suite is expected to pass on every interpreter in the declared
+`requires-python` range (3.10 through 3.13); CI runs all four on Ubuntu and
+macOS.
 
 The installed-runtime probe builds and installs the wheel offline, uses a
 synthetic home, config root, Engram data root, and Git repositories, and checks
 the real stdio initialize/tools/list/`mem_current_project` path. Candidate
 binary validation is intentionally isolated from real memory data; follow
 [docs/UPGRADES.md](docs/UPGRADES.md) before changing release status.
+
+### Environment constraints
+
+Managed writes refuse symbolic links anywhere in a runtime or workspace path, so
+two environments need an explicit adjustment:
+
+- A symlinked home directory: rerun with `HOME` set to its resolved physical
+  path, for example `HOME="$(cd "$HOME" && pwd -P)"`.
+- A real home whose configuration directory is a symlink: set
+  `NAOS_ENGRAM_MEMORY_CONFIG_DIR` to a path whose every component is real.
+
+`NAOS_ENGRAM_MEMORY_CONFIG_DIR` cannot substitute for the first case, because the
+home check runs independently of it. See
+[docs/ADMINISTRATION.md](docs/ADMINISTRATION.md).

@@ -44,6 +44,14 @@ naos-engram-memory client install --client cursor `
   --project project-b --workspace . --yes
 ```
 
+`--id` is honoured for a remote that is not yet registered. If the workspace's
+origin is *already* registered, one approved remote maps to exactly one canonical
+project, so registration is idempotent: it reports the existing
+`already_registered` project and exits 0 without applying `--id`. When the
+requested identifier differs from the recorded one, the JSON adds
+`requested_id` with `requested_id_honoured: false` and a notice is written to
+stderr. Run `--dry-run` first to see the identifier that will actually be used.
+
 Each workspace then owns its own `.cursor/mcp.json`, `.vscode/mcp.json`,
 `.agents/mcp_config.json`, or other documented project configuration. The
 wrapper validates the active workspace's approved Git remote before selecting

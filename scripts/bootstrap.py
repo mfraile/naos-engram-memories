@@ -8,12 +8,14 @@ import hashlib
 import json
 import os
 import shutil
+import site
 import subprocess
 import sys
+import sysconfig
 from pathlib import Path
 
 
-PINNED_PACKAGE = "naos-engram-memories==1.0.0"
+PINNED_PACKAGE = "naos-engram-memories==1.0.1"
 
 
 def candidates(explicit: str | None = None) -> list[dict[str, object]]:
@@ -131,20 +133,51 @@ def select_python_candidate(
     return selected
 
 
+def share_dirs() -> tuple[Path, ...]:
+    """Return candidate packaged resource roots for every supported install scheme.
+
+    This deliberately mirrors ``resource_data_roots`` in ``tools/engram_memory.py``.
+    Bootstrap must stay importable before the package is installed, so it cannot
+    import that module and keeps its own copy of the same ordered contract:
+    packaged ``data_files`` only land under ``sys.prefix`` for a virtual
+    environment or pipx, and a ``--user``, ``--target``, or ``--prefix`` install
+    puts them elsewhere.
+    """
+    roots: list[Path] = []
+
+    def remember(value: str | os.PathLike[str] | None) -> None:
+        if not value:
+            return
+        path = Path(value)
+        if path not in roots:
+            roots.append(path)
+
+    remember(sys.prefix)
+    remember(sysconfig.get_path("data"))
+    try:
+        remember(site.getuserbase())
+    except (AttributeError, OSError):  # pragma: no cover - defensive
+        pass
+    remember(sys.base_prefix)
+    script_dir = Path(__file__).resolve().parent
+    remember(script_dir.parent)
+    return tuple(root / "share" / "naos-engram-memory" for root in roots)
+
+
 def verify_asset(name: str) -> int:
     script_dir = Path(__file__).resolve().parent
-    share_dir = Path(sys.prefix) / "share" / "naos-engram-memory"
+    shares = share_dirs()
     manifest_candidates = (
         script_dir.parent / "config" / "bootstrap-assets.v1.json",
-        share_dir / "config" / "bootstrap-assets.v1.json",
+        *(share / "config" / "bootstrap-assets.v1.json" for share in shares),
     )
     manifest = next((path for path in manifest_candidates if path.exists()), manifest_candidates[0])
     try:
         expected = json.loads(manifest.read_text(encoding="utf-8"))["assets"][name]
-    except (OSError, KeyError, json.JSONDecodeError) as exc:
+    except (OSError, KeyError, json.JSONDecodeError):
         print("Bootstrap integrity manifest is unavailable or invalid.", file=sys.stderr)
         return 2
-    target_candidates = (script_dir / name, share_dir / "scripts" / name)
+    target_candidates = (script_dir / name, *(share / "scripts" / name for share in shares))
     target = next((path for path in target_candidates if path.is_file()), target_candidates[0])
     if not target.is_file():
         print(f"Bootstrap asset is missing: {name}", file=sys.stderr)

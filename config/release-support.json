@@ -44,7 +44,16 @@
           "status": "supported",
           "asset": "engram_1.20.0_windows_amd64.zip",
           "sha256": "c945c47d58367f943642cb8451fa45f208174407839f1dda33a975a05d6e465b",
-          "evidence": "The official release ZIP matched upstream checksums.txt and this allowlist, contained one safe engram.exe, and the extracted binary identity was bound to installed-runtime validation. Provider lifecycle paths, Windows-specific unit tests, offline toolkit wheel build and integrity, provider adoption, managed runtime, MCP initialization, project resolution, and fail-closed unregistered-project behavior passed on Windows AMD64. This promotes provider lifecycle support only; named Windows IDE/AI hosts remain independently gated. See docs/evidence/v1.20.0-windows-amd64.json."
+          "evidence": "The official release ZIP matched upstream checksums.txt and this allowlist, contained one safe engram.exe, and the extracted binary identity was bound to installed-runtime validation. Provider lifecycle paths, Windows-specific unit tests, offline toolkit wheel build and integrity, provider adoption, managed runtime, MCP initialization, project resolution, and fail-closed unregistered-project behavior passed on Windows AMD64. This promotes provider lifecycle support only; named Windows IDE/AI hosts remain independently gated. See docs/evidence/v1.20.0-windows-amd64.json.",
+          "promotion": {
+            "kind": "explicit_owner_decision",
+            "reason": "The cited receipt records disposition=candidate_passed_not_release_attestation with source_worktree_dirty=true and states that release promotion remains a separate decision. This status is that decision, not something the receipt established on its own.",
+            "residual_gaps": [
+              "The validation run was taken from a dirty worktree, so it is not a clean-tree attestation and is not reproducible from the published history.",
+              "Only ASCII MCP payloads were exercised; a non-ASCII stdio round trip through powershell.exe is unvalidated. See docs/evidence/README.md.",
+              "Windows ARM64 is a separate platform key (windows_arm64) with no allowlisted asset and is refused."
+            ]
+          }
         }
       }
     },
