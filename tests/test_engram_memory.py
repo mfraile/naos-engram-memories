@@ -7,6 +7,7 @@ import importlib.util
 import io
 import json
 import os
+import re
 import shutil
 import site
 import subprocess
@@ -2323,7 +2324,7 @@ class ScriptContractTests(unittest.TestCase):
         source = (ROOT / "scripts" / "engram_mcp_wrapper.ps1").read_text(encoding="utf-8")
         self.assertNotRegex(source, r"&\s+\$EngramBin\s+version")
         self.assertNotRegex(source, r"&\s+\$EngramBin\s+doctor")
-        self.assertIn("mcp '--tools=agent'", source)
+        self.assertIn("mcp '--tools=mem_current_project,mem_context,mem_search,mem_get_observation,mem_save,mem_session_summary'", source)
         for variable in (
             "ENGRAM_CLOUD_AUTOSYNC", "ENGRAM_CLOUD_SERVER", "ENGRAM_CLOUD_TOKEN",
             "ENGRAM_REMOTE_URL", "ENGRAM_TOKEN",
@@ -2576,7 +2577,7 @@ class ScriptContractTests(unittest.TestCase):
         self.assertIn("incoming_project_signal=$incomingProjectSignal", windows_wrapper)
         self.assertIn('/usr/bin/env -i', wrapper)
         self.assertIn('ENGRAM_PROJECT="$CANONICAL_PROJECT"', wrapper)
-        self.assertIn('mcp --tools=agent --project="$CANONICAL_PROJECT"', wrapper)
+        self.assertIn('mcp --tools=mem_current_project,mem_context,mem_search,mem_get_observation,mem_save,mem_session_summary --project="$CANONICAL_PROJECT"', wrapper)
         self.assertIn('--config-dir "$NAOS_ENGRAM_MEMORY_CONFIG_DIR"', wrapper)
         self.assertIn('--config-dir $ConfigDir', windows_wrapper)
         self.assertIn("GetEnvironmentVariables('Process')", windows_wrapper)
@@ -2594,9 +2595,16 @@ class ScriptContractTests(unittest.TestCase):
         for guard in (
             "Stop-Wrapper 'ERROR cloud/autosync environment is unsupported by this locked local-only wrapper' 64",
             "Stop-Wrapper 'ERROR toolkit path overrides are not accepted by the installed MCP wrapper' 64",
-            "Stop-Wrapper 'ERROR custom ENGRAM_DATA_DIR is unsupported by the managed wrapper in this release' 64",
         ):
             self.assertIn(guard, windows_wrapper)
+        # ENGRAM_DATA_DIR is no longer a blanket refusal: it is accepted when it
+        # names the store this release already manages and refused only when it
+        # names a different one, so its guard carries an interpolated path.
+        self.assertIn(
+            'Stop-Wrapper "ERROR ENGRAM_DATA_DIR names a different store than this release manages;',
+            windows_wrapper,
+        )
+        self.assertIn("$managedDataDir = Join-Path $HOME '.engram'", windows_wrapper)
         executable_lines = [
             line
             for line in windows_wrapper.splitlines()
@@ -2740,7 +2748,7 @@ class ScriptContractTests(unittest.TestCase):
             self.assertIn("resolution_source=approved_git_remote", result.stderr)
             self.assertIn("incoming_project_signal=absent", result.stderr)
             calls = provider_call_log.read_text(encoding="utf-8").splitlines()
-            self.assertEqual([f"mcp --tools=agent --project={project['id']}"], calls)
+            self.assertEqual([f"mcp --tools=mem_current_project,mem_context,mem_search,mem_get_observation,mem_save,mem_session_summary --project={project['id']}"], calls)
 
             process_cwd_environment = dict(environment)
             process_cwd_environment.pop("CLAUDE_PROJECT_DIR")
@@ -3395,6 +3403,181 @@ class CommandSurfaceTests(unittest.TestCase):
             self.assertEqual("a-different-id", payload["requested_id"])
             self.assertFalse(payload["requested_id_honoured"])
             self.assertIn("was not applied", result.stderr)
+
+
+class ProviderToolSurfaceTests(unittest.TestCase):
+    """The wrapper must pin an explicit tool allowlist, not a profile name."""
+
+    # Intersection of the provider's v1.20.0 agent profile with the memory tool
+    # vocabulary NAOS governance recognises (ENGRAM_TOOL_NAMES in
+    # naos-governance/scripts/naos_mcp_config_registry.py).
+    GOVERNED_TOOLS = (
+        "mem_current_project",
+        "mem_context",
+        "mem_search",
+        "mem_get_observation",
+        "mem_save",
+        "mem_session_summary",
+    )
+    # Present in the provider's agent profile but deliberately excluded.
+    EXCLUDED_TOOLS = (
+        "mem_list_projects",   # cross-project enumeration; forbidden by the protocol
+        "mem_delete",
+        "mem_merge_projects",
+        "mem_update",
+        "mem_suggest_topic_key",
+        "mem_capture_passive",
+        "mem_save_prompt",
+    )
+
+    def _wrappers(self) -> dict[str, str]:
+        return {
+            name: (ROOT / "scripts" / name).read_text(encoding="utf-8")
+            for name in ("engram_mcp_wrapper.sh", "engram_mcp_wrapper.ps1")
+        }
+
+    def test_both_wrappers_pin_the_same_explicit_allowlist(self) -> None:
+        expected = "--tools=" + ",".join(self.GOVERNED_TOOLS)
+        for name, source in self._wrappers().items():
+            with self.subTest(wrapper=name):
+                self.assertIn(expected, source)
+                # A profile name would let the surface change under us.
+                self.assertNotIn("--tools=agent", source)
+                self.assertNotIn("--tools=all", source)
+
+    def test_excluded_tools_are_absent_from_the_wrappers(self) -> None:
+        for name, source in self._wrappers().items():
+            for tool in self.EXCLUDED_TOOLS:
+                with self.subTest(wrapper=name, tool=tool):
+                    self.assertNotIn(tool, source)
+
+    def test_allowlist_is_exactly_the_governed_intersection(self) -> None:
+        source = (ROOT / "scripts" / "engram_mcp_wrapper.sh").read_text(encoding="utf-8")
+        declared = [
+            fragment.split("=", 1)[1].split()[0]
+            for fragment in source.splitlines()
+            if "--tools=" in fragment
+        ]
+        self.assertEqual(1, len(declared), "exactly one --tools= declaration expected")
+        self.assertEqual(list(self.GOVERNED_TOOLS), declared[0].split(","))
+
+    def test_instruction_templates_only_reference_allowlisted_tools(self) -> None:
+        # A template that names a tool the wrapper no longer exposes would be
+        # instructing the model to call something that cannot answer.
+        allowed = set(self.GOVERNED_TOOLS)
+        for template in (ROOT / "instructions").glob("*.md"):
+            text = template.read_text(encoding="utf-8")
+            for tool in self.EXCLUDED_TOOLS:
+                with self.subTest(template=template.name, tool=tool):
+                    self.assertNotIn(tool, text)
+            for match in re.findall(r"mem_[a-z_]+", text):
+                with self.subTest(template=template.name, referenced=match):
+                    self.assertIn(match, allowed)
+
+
+class WrapperStartupCostTests(unittest.TestCase):
+    """The stdio wrapper must not start an interpreter merely to parse output."""
+
+    def test_unix_wrapper_starts_python_only_for_resolution_and_verification(self) -> None:
+        source = (ROOT / "scripts" / "engram_mcp_wrapper.sh").read_text(encoding="utf-8")
+        invocations = [
+            line.strip()
+            for line in source.splitlines()
+            if '"$PYTHON_EXECUTABLE" "$NAOS_ENGRAM_MEMORY_TOOL"' in line
+        ]
+        self.assertEqual(
+            2,
+            len(invocations),
+            "expected exactly two managed-tool interpreter starts (resolve, verify-bound); "
+            f"found {len(invocations)}: {invocations}",
+        )
+        # The resolve call passes its subcommand through RESOLUTION_ARGS.
+        self.assertTrue(any("RESOLUTION_ARGS" in line for line in invocations))
+        self.assertTrue(any("verify-bound" in line for line in invocations))
+        self.assertIn("resolve --format=shell", source)
+
+    def test_unix_wrapper_does_not_shell_out_to_parse_json(self) -> None:
+        source = (ROOT / "scripts" / "engram_mcp_wrapper.sh").read_text(encoding="utf-8")
+        self.assertNotIn("-c 'import json", source)
+        self.assertNotIn("import json,sys", source)
+        self.assertIn("resolve --format=shell", source)
+
+    def test_verify_bound_still_runs_after_the_client_lease_exists(self) -> None:
+        # Moving verification earlier -- for example by folding it into resolve --
+        # would reopen a window where maintenance could swap the binary between
+        # verification and spawn, so the ordering is part of the contract.
+        source = (ROOT / "scripts" / "engram_mcp_wrapper.sh").read_text(encoding="utf-8")
+        lease = source.index("CLIENT_LEASE_DIR=\"$(mktemp -d")
+        verify = source.index("provider verify-bound")
+        spawn = source.index("mcp --tools=")
+        self.assertLess(lease, verify, "verify-bound must follow lease creation")
+        self.assertLess(verify, spawn, "verify-bound must precede provider spawn")
+
+    def test_shell_resolution_form_is_validated_before_emission(self) -> None:
+        registry = memory.load_json(SYNTHETIC_REGISTRY)
+        with tempfile.TemporaryDirectory() as temporary:
+            workspace = Path(temporary) / "workspace"
+            workspace.mkdir()
+            subprocess.run(["git", "-C", str(workspace), "init", "-q"], check=True)
+            subprocess.run(
+                [
+                    "git", "-C", str(workspace), "remote", "add", "origin",
+                    "https://github.com/example-org/example-product.git",
+                ],
+                check=True,
+            )
+            result = subprocess.run(
+                [
+                    sys.executable, str(ROOT / "tools" / "engram_memory.py"),
+                    "--registry", str(SYNTHETIC_REGISTRY), "resolve", "--format=shell",
+                ],
+                cwd=workspace, text=True,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+            )
+            self.assertEqual(0, result.returncode, result.stderr)
+            lines = result.stdout.strip().splitlines()
+            self.assertEqual(
+                ["project=example-product", "source=approved_git_remote"], lines
+            )
+            # No shell metacharacter may reach an unquoted shell assignment.
+            for line in lines:
+                self.assertNotRegex(line, r"[\s$`\\\"';|&<>()]")
+        self.assertTrue(registry["projects"])
+
+
+class PostInstallGuidanceTests(unittest.TestCase):
+    """client install must surface the catalogue's own per-host guidance."""
+
+    def test_steps_are_advisory_and_claim_no_runtime_verification(self) -> None:
+        catalogue = memory.host_catalogue(
+            memory.load_json(memory.bundled_config_path("mcp-hosts.v1.json"))
+        )
+        steps = memory.host_post_install_steps(catalogue, "vscode-generic")
+        self.assertTrue(steps)
+        joined = " ".join(steps)
+        self.assertIn(".vscode/mcp.json", joined)
+        self.assertIn("mem_current_project", joined)
+        self.assertIn("has not verified", joined)
+        for claim in ("verified that the host started", "memory call succeeded and"):
+            self.assertNotIn(f"toolkit {claim}", joined)
+
+    def test_every_installable_host_yields_guidance(self) -> None:
+        catalogue = memory.host_catalogue(
+            memory.load_json(memory.bundled_config_path("mcp-hosts.v1.json"))
+        )
+        for host in catalogue["hosts"]:
+            if host.get("config_target") in {None, "", "none"}:
+                continue
+            with self.subTest(host=host["id"]):
+                steps = memory.host_post_install_steps(catalogue, host["id"])
+                self.assertTrue(steps, f"{host['id']} produced no guidance")
+                self.assertTrue(any(host["config_target"] in step for step in steps))
+
+    def test_unknown_host_yields_no_guidance(self) -> None:
+        catalogue = memory.host_catalogue(
+            memory.load_json(memory.bundled_config_path("mcp-hosts.v1.json"))
+        )
+        self.assertEqual([], memory.host_post_install_steps(catalogue, "not-a-host"))
 
 
 class OfflineBuildBackendTests(unittest.TestCase):

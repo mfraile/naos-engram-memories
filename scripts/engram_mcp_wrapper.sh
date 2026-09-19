@@ -13,9 +13,28 @@ if [[ -n "${ENGRAM_MEMORY_CONFIG_DIR:-}${ENGRAM_MEMORY_TOOL:-}${ENGRAM_MEMORY_RE
   printf '%s\n' 'ERROR toolkit path overrides are not accepted by the installed MCP wrapper' >&2
   exit 64
 fi
+# NAOS governance declares data_dir: ~/.engram and documents ENGRAM_DATA_DIR as a
+# runtime override, so a caller that merely restates the managed store used to be
+# refused for agreeing with us. Accept that, refuse only a different store: the
+# effective store still cannot vary, so maintenance can never back up or probe a
+# database Engram does not open. Normalized with builtins only — no extra forks.
 if [[ -n "${ENGRAM_DATA_DIR:-}" ]]; then
-  printf '%s\n' 'ERROR custom ENGRAM_DATA_DIR is unsupported by the managed wrapper in this release' >&2
-  exit 64
+  MANAGED_DATA_DIR="${HOME}/.engram"
+  DECLARED_DATA_DIR="$ENGRAM_DATA_DIR"
+  case "$DECLARED_DATA_DIR" in
+    '~') DECLARED_DATA_DIR="$HOME" ;;
+    '~/'*) DECLARED_DATA_DIR="${HOME}/${DECLARED_DATA_DIR#\~/}" ;;
+  esac
+  while [[ "$DECLARED_DATA_DIR" == */ && ${#DECLARED_DATA_DIR} -gt 1 ]]; do
+    DECLARED_DATA_DIR="${DECLARED_DATA_DIR%/}"
+  done
+  while [[ "$MANAGED_DATA_DIR" == */ && ${#MANAGED_DATA_DIR} -gt 1 ]]; do
+    MANAGED_DATA_DIR="${MANAGED_DATA_DIR%/}"
+  done
+  if [[ "$DECLARED_DATA_DIR" != "$MANAGED_DATA_DIR" ]]; then
+    printf 'ERROR ENGRAM_DATA_DIR names a different store than this release manages; unset it or set it to %s\n' "$MANAGED_DATA_DIR" >&2
+    exit 64
+  fi
 fi
 NAOS_ENGRAM_MEMORY_CONFIG_DIR=__NAOS_ENGRAM_MEMORY_CONFIG_DIR__
 if [[ "$NAOS_ENGRAM_MEMORY_CONFIG_DIR" == "__NAOS""_ENGRAM_MEMORY_CONFIG_DIR__" ]]; then
@@ -87,14 +106,30 @@ else
   PROJECT_CWD="$PWD"
   WORKSPACE_SIGNAL=process_cwd
 fi
-RESOLUTION_ARGS=(--registry "$NAOS_ENGRAM_MEMORY_REGISTRY" resolve --cwd "$PROJECT_CWD")
+# Ask for the shell form and read it with builtins. Parsing the JSON form used to
+# cost two extra interpreter starts purely to pull two fields the first call had
+# already printed; a lower fork count also matters where an endpoint agent can
+# stall a forking helper.
+RESOLUTION_ARGS=(--registry "$NAOS_ENGRAM_MEMORY_REGISTRY" resolve --format=shell --cwd "$PROJECT_CWD")
 [[ -n "$REQUESTED_PROJECT" ]] && RESOLUTION_ARGS+=(--project "$REQUESTED_PROJECT")
 if ! RESOLUTION="$("$PYTHON_EXECUTABLE" "$NAOS_ENGRAM_MEMORY_TOOL" "${RESOLUTION_ARGS[@]}" 2>&1)"; then
   log "ERROR canonical-project-resolution-failed; inspect a redacted inventory"
   exit 64
 fi
-CANONICAL_PROJECT="$("$PYTHON_EXECUTABLE" -c 'import json,sys; print(json.load(sys.stdin)["project"])' <<<"$RESOLUTION")"
-RESOLUTION_SOURCE="$("$PYTHON_EXECUTABLE" -c 'import json,sys; print(json.load(sys.stdin)["source"])' <<<"$RESOLUTION")"
+CANONICAL_PROJECT=''
+RESOLUTION_SOURCE=''
+while IFS='=' read -r resolution_key resolution_value; do
+  case "$resolution_key" in
+    project) CANONICAL_PROJECT="$resolution_value" ;;
+    source) RESOLUTION_SOURCE="$resolution_value" ;;
+  esac
+done <<<"$RESOLUTION"
+# The emitter validates both fields, so a value that fails here means the output
+# was not produced by the managed tool at all.
+if [[ ! "$CANONICAL_PROJECT" =~ ^[a-z0-9][a-z0-9._-]{1,127}$ ]]; then
+  log 'ERROR canonical-project-resolution-returned-unsupported-project'
+  exit 64
+fi
 case "$RESOLUTION_SOURCE" in
   approved_git_remote|registered_explicit_project) ;;
   *) log 'ERROR canonical-project-resolution-returned-unsupported-source'; exit 64 ;;
@@ -153,7 +188,7 @@ log "spawn project=${CANONICAL_PROJECT} workspace_signal=${WORKSPACE_SIGNAL} res
   LC_ALL="C" \
   NO_COLOR="1" \
   ENGRAM_PROJECT="$CANONICAL_PROJECT" \
-  "$ENGRAM_EXECUTABLE" mcp --tools=agent --project="$CANONICAL_PROJECT" <&0 &
+  "$ENGRAM_EXECUTABLE" mcp --tools=mem_current_project,mem_context,mem_search,mem_get_observation,mem_save,mem_session_summary --project="$CANONICAL_PROJECT" <&0 &
 CHILD_PID=$!
 set +e
 wait "$CHILD_PID"

@@ -14,8 +14,24 @@ $legacyNames = @('ENGRAM_MEMORY_CONFIG_DIR', 'ENGRAM_MEMORY_TOOL', 'ENGRAM_MEMOR
 if ($legacyNames | Where-Object { [Environment]::GetEnvironmentVariable($_) }) {
     Stop-Wrapper 'ERROR toolkit path overrides are not accepted by the installed MCP wrapper' 64
 }
+# NAOS governance declares data_dir: ~/.engram and documents ENGRAM_DATA_DIR as a
+# runtime override, so a caller that merely restates the managed store used to be
+# refused for agreeing with us. Accept that, refuse only a different store: the
+# effective store still cannot vary, so maintenance can never back up or probe a
+# database Engram does not open.
 if ($env:ENGRAM_DATA_DIR) {
-    Stop-Wrapper 'ERROR custom ENGRAM_DATA_DIR is unsupported by the managed wrapper in this release' 64
+    $managedDataDir = Join-Path $HOME '.engram'
+    $declaredDataDir = $env:ENGRAM_DATA_DIR
+    if ($declaredDataDir -eq '~') { $declaredDataDir = [string]$HOME }
+    elseif ($declaredDataDir.StartsWith('~/') -or $declaredDataDir.StartsWith('~\')) {
+        $declaredDataDir = Join-Path $HOME $declaredDataDir.Substring(2)
+    }
+    $trim = [char[]]@([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar)
+    $declaredNormalized = $declaredDataDir.TrimEnd($trim)
+    $managedNormalized = $managedDataDir.TrimEnd($trim)
+    if (-not [string]::Equals($declaredNormalized, $managedNormalized, [System.StringComparison]::OrdinalIgnoreCase)) {
+        Stop-Wrapper "ERROR ENGRAM_DATA_DIR names a different store than this release manages; unset it or set it to $managedNormalized" 64
+    }
 }
 $ConfigDir = __NAOS_ENGRAM_MEMORY_CONFIG_DIR__
 if ($ConfigDir -eq ('__NAOS' + '_ENGRAM_MEMORY_CONFIG_DIR__')) { $ConfigDir = $defaultConfigDir }
@@ -109,7 +125,7 @@ foreach ($entry in $allowedChildEnvironment.GetEnumerator()) {
 }
 $providerExitCode = 1
 try {
-    & $EngramBin mcp '--tools=agent' "--project=$canonical"
+    & $EngramBin mcp '--tools=mem_current_project,mem_context,mem_search,mem_get_observation,mem_save,mem_session_summary' "--project=$canonical"
     $providerExitCode = $LASTEXITCODE
 } finally {
     # Remove only the lease directory created by this wrapper. If another

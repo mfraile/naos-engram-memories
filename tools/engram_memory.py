@@ -1618,6 +1618,36 @@ def release_status(support: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def host_post_install_steps(catalogue: dict[str, Any], client: str) -> list[str]:
+    """Return the advisory steps an operator still has to perform by hand.
+
+    The catalogue already records a per-host verification instruction and config
+    target; nothing consumed them, so an install reported only that a file was
+    written. These are advisory strings: they never assert that the host started
+    or that a memory call succeeded.
+    """
+    entry = next(
+        (host for host in catalogue.get("hosts", []) if host.get("id") == client), None
+    )
+    if entry is None:
+        return []
+    steps: list[str] = []
+    target = entry.get("config_target")
+    if isinstance(target, str) and target and target != "none":
+        steps.append(f"Review the managed entry written to {target}.")
+    verification = entry.get("verification_instruction")
+    if isinstance(verification, str) and verification:
+        steps.append(verification)
+    repair = entry.get("repair_path")
+    if isinstance(repair, str) and repair and repair != "none":
+        steps.append(f"If the entry is stale or conflicting: {repair}")
+    steps.append(
+        "This toolkit has not verified that the host started or that a memory call "
+        "succeeded; confirm both yourself before relying on recall."
+    )
+    return steps
+
+
 def host_catalogue(catalogue: dict[str, Any]) -> dict[str, Any]:
     if catalogue.get("schema_version") != 1 or not isinstance(catalogue.get("hosts"), list):
         raise EngramMemoryError("unsupported MCP-host catalogue schema")
@@ -2096,6 +2126,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     resolve_parser.add_argument("--remote", help="approved Git remote URL to resolve instead of reading a workspace")
     resolve_parser.add_argument(
+        "--format",
+        choices=("json", "shell"),
+        default="json",
+        help=(
+            "output shape; 'shell' emits key=value lines so a POSIX wrapper can read the "
+            "result with builtins instead of starting another interpreter to parse JSON"
+        ),
+    )
+    resolve_parser.add_argument(
         "--cwd",
         type=Path,
         # Without a default, a bare "resolve" inspected no directory at all and
@@ -2411,6 +2450,15 @@ def main(argv: list[str] | None = None) -> int:
                 host_version=args.host_version, dry_run=args.dry_run,
                 repair=args.client_command == "repair",
             )
+            steps = host_post_install_steps(
+                host_catalogue(read_config(
+                    args.catalogue,
+                    default_name="mcp-hosts.v1.json" if args.catalogue == DEFAULT_HOST_CATALOGUE else None,
+                )),
+                args.client,
+            )
+            if steps:
+                result = {**result, "post_install": steps}
             print(json.dumps(result, indent=2, sort_keys=True))
         elif args.command == "client" and args.client_command == "verify":
             wrapper = args.wrapper or user_wrapper_path()
@@ -2427,7 +2475,18 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "resolve":
             remote = args.remote or (git_origin(args.cwd) if args.cwd else None)
             project, source = resolve_project(registry, requested=args.project, remote=remote)
-            print(json.dumps({"project": project, "source": source}, sort_keys=True))
+            if args.format == "shell":
+                # Both values are already constrained -- project by PROJECT_ID and
+                # source by a closed set -- but re-assert it here because this form
+                # is consumed by a shell without quoting.
+                if not PROJECT_ID.fullmatch(project):
+                    raise EngramMemoryError("resolved project is not a valid canonical identifier")
+                if source not in {"registered_explicit_project", "approved_git_remote"}:
+                    raise EngramMemoryError("resolved project source is not a supported value")
+                print(f"project={project}")
+                print(f"source={source}")
+            else:
+                print(json.dumps({"project": project, "source": source}, sort_keys=True))
         elif args.command == "render-client":
             print(render_client_adapter(
                 registry,

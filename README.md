@@ -101,6 +101,41 @@ naos-engram-memory provider install --maintenance-window --yes --dry-run
 naos-engram-memory provider install --maintenance-window --yes
 ```
 
+### Choosing how to obtain the provider
+
+`provider install` downloads the one allowlisted release asset. That is not always
+the best route, and on two platforms it is the worse one:
+
+- **macOS and Linux — prefer Homebrew, then adopt.** Upstream's recommended path is
+  `brew install gentleman-programming/tap/engram`, and its release automation
+  publishes that formula. Installing the asset separately competes with Homebrew
+  and can leave two binaries on `PATH`. If you use Homebrew, let it own the
+  binary and bind it here instead: `provider adopt` resolves the Homebrew symlink
+  once and records the real executable path and hash. Upgrade with Homebrew, then
+  re-adopt.
+- **macOS binaries are ad-hoc signed only.** Upstream signs with
+  `codesign --force --sign -`, not a Developer ID, so Gatekeeper may still object
+  on first run. That is an upstream distribution property, not something this
+  toolkit can resolve.
+- **Windows — the prebuilt binary is known to trip antivirus.** Upstream documents
+  Windows Defender, ESET, and others flagging its prebuilt releases as
+  `Trojan:Script/Wacatac.H!ml` or similar, identifies it as a heuristic false
+  positive on unsigned Go binaries, and states it will not purchase a code-signing
+  certificate. Upstream's own advice to technical users is to build locally with
+  `go install`. This toolkit cannot verify a locally built binary against a release
+  checksum, but it can still bind one:
+
+  ```powershell
+  go install github.com/Gentleman-Programming/engram/cmd/engram@latest
+  naos-engram-memory provider adopt --path "$env:USERPROFILE\go\bin\engram.exe" --dry-run
+  naos-engram-memory provider adopt --path "$env:USERPROFILE\go\bin\engram.exe" --yes
+  ```
+
+  Adoption still enforces the approved version and records the SHA-256 the managed
+  wrapper verifies before every start. What it cannot do is prove provenance from
+  a signed release, so it reports `network_access_status: not_observed` and marks
+  the provenance external.
+
 Use `provider upgrade` or `provider rollback` with the same two confirmations.
 The dry-run reads only the packaged allowlist and makes no network request or
 write. A real install/upgrade downloads the one exact release asset, verifies
@@ -131,13 +166,30 @@ and hash before every start. Because the version probe is an external command,
 its network behavior is reported as `not_observed`, not falsely as offline.
 The toolkit never upgrades or rolls back an adopted external executable:
 upgrade it with its owner (for example Homebrew), then explicitly re-adopt it.
-Custom `ENGRAM_DATA_DIR` stores are not supported by this local-default release;
-adoption, provider mutation, and managed wrapper startup refuse the override so
-maintenance cannot back up or probe a different database than Engram will use.
-The wrapper invokes `mcp --tools=agent`, excluding the provider's administrative
-delete/merge profile, and refuses the verified cloud autosync/server/token,
-legacy remote/token, database-URL, and JWT-secret environment variables before
-provider startup.
+`ENGRAM_DATA_DIR` is accepted when it names the store this release manages
+(`~/.engram`, which is also the path NAOS governance declares) and refused with
+exit 64 when it names a different one. A custom store stays unsupported because
+maintenance would otherwise back up or probe a database Engram does not open;
+because the effective store cannot vary, restating it is now harmless rather than
+a refusal. The comparison is lexical on the normalized absolute path — resolving
+symlinks to force a match would accept a path the managed symlink policy refuses.
+
+The wrapper starts the provider with an explicit tool allowlist rather than a
+profile name:
+
+```
+mcp --tools=mem_current_project,mem_context,mem_search,mem_get_observation,mem_save,mem_session_summary
+```
+
+Those six are the intersection of the provider's agent profile with the memory
+tool vocabulary NAOS governance recognises, so the exposed surface is a
+deterministic boundary instead of a profile whose membership can change between
+provider releases. The provider's administrative delete/merge tools are excluded,
+as is cross-project enumeration: upstream added `mem_list_projects` to the agent
+profile after v1.20.0, and this toolkit's project-isolation protocol forbids it.
+The wrapper also refuses the verified cloud autosync/server/token, legacy
+remote/token, database-URL, and JWT-secret environment variables before provider
+startup.
 Cloud synchronization remains outside this locked local-only release.
 
 `onboard` defaults to the `local` profile. Its initial assessment is read-only,
@@ -353,15 +405,29 @@ Platform support is an allowlist, so an unlisted platform fails closed rather
 than downloading an unvalidated asset. The toolkit CLI itself is pure Python and
 runs anywhere Python 3.10+ runs; the table describes the *provider* lifecycle.
 
+Upstream publishes six assets for every release. This release pins a verified
+SHA-256 for all six — each one checked against upstream's `checksums.txt` — but a
+platform is promoted to `supported` only after an installed-runtime validation has
+actually run on that platform's hardware. Three platforms are therefore
+checksum-pinned and still `experimental`.
+
 | Platform | `provider install`/`upgrade`/`rollback` | `provider adopt` |
 | --- | --- | --- |
 | macOS ARM64 (Apple Silicon) | supported | supported |
 | Linux x86-64 | supported | supported |
 | Windows x86-64 | supported | supported |
-| macOS x86-64 (Intel) | refused — no allowlisted asset | `--allow-unvalidated-platform` |
-| Linux ARM64 / aarch64 | refused — no allowlisted asset | `--allow-unvalidated-platform` |
-| Windows ARM64 | refused — no allowlisted asset | `--allow-unvalidated-platform` |
-| anything else | refused | `--allow-unvalidated-platform` |
+| macOS x86-64 (Intel) | refused — checksum pinned, validation pending | `--allow-unvalidated-platform` |
+| Linux ARM64 / aarch64 | refused — checksum pinned, validation pending | `--allow-unvalidated-platform` |
+| Windows ARM64 | refused — checksum pinned, validation pending | `--allow-unvalidated-platform` |
+| anything else | refused — no published asset | `--allow-unvalidated-platform` |
+
+For the three pending platforms the archive identity *has* been verified — the
+published checksum matches and the archive contains exactly one safe binary
+member — but the binary has never been executed on that architecture, and no MCP
+stdio round trip or wrapper start has been exercised there. See
+`docs/evidence/v1.20.0-asset-identity-*.json` for exactly what each receipt does
+and does not establish, and [docs/UPGRADES.md](docs/UPGRADES.md) for the one-step
+promotion once you can run the validator on that hardware.
 
 On a platform with no allowlisted asset you can still bind an `engram` you
 installed yourself. This is an explicit owner decision, never a default:

@@ -35,11 +35,34 @@ Downloader = Callable[[str, Path], None]
 ActiveProbe = Callable[[Path], bool]
 
 
-def _reject_custom_data_dir() -> None:
-    if os.environ.get("ENGRAM_DATA_DIR"):
-        raise ProviderError(
-            "custom ENGRAM_DATA_DIR is unsupported for managed provider maintenance in this release"
-        )
+def managed_data_dir(home: Path) -> Path:
+    """Return the one store this release manages for a given home."""
+    return Path(os.path.abspath((home / ".engram").expanduser()))
+
+
+def _reject_conflicting_data_dir(home: Path) -> None:
+    """Accept ENGRAM_DATA_DIR only when it names the store already managed here.
+
+    NAOS governance declares ``data_dir: ~/.engram`` and documents the variable as
+    a runtime override, so a caller that merely restates the managed store used to
+    be refused for agreeing. Refusing only a *different* store keeps the invariant
+    intact — maintenance must never back up or probe a database other than the one
+    Engram opens — because the effective store still cannot vary.
+
+    Comparison is lexical on the normalized absolute path. Resolving symlinks to
+    force a match would accept a path the managed symlink policy refuses.
+    """
+    declared = os.environ.get("ENGRAM_DATA_DIR")
+    if not declared:
+        return
+    expected = managed_data_dir(home)
+    if Path(os.path.abspath(Path(declared).expanduser())) == expected:
+        return
+    raise ProviderError(
+        "ENGRAM_DATA_DIR names a different store than this release manages; it must be "
+        f"unset or resolve to {expected}. A custom store is unsupported here because "
+        "maintenance would otherwise back up or probe a database Engram does not open"
+    )
 
 
 def _reject_link(path: Path, *, label: str) -> None:
@@ -490,7 +513,7 @@ def adopt_existing_provider(
     allow_unvalidated_platform: bool = False,
 ) -> dict[str, Any]:
     """Explicitly adopt a local provider without copying or replacing it."""
-    _reject_custom_data_dir()
+    _reject_conflicting_data_dir(home)
     selected_platform = selected_platform or platform_key()
     if not yes and not dry_run:
         raise ProviderError("existing provider adoption requires explicit --yes confirmation")
@@ -1016,7 +1039,7 @@ def mutate_provider(
     downloader: Downloader = _download_https,
     active_probe: ActiveProbe = active_engram_use,
 ) -> dict[str, Any]:
-    _reject_custom_data_dir()
+    _reject_conflicting_data_dir(home)
     if operation not in {"install", "upgrade", "rollback"}:
         raise ProviderError("unsupported provider operation")
     selected_platform = selected_platform or platform_key()

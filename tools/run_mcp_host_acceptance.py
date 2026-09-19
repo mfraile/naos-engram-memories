@@ -640,7 +640,7 @@ def wrapper_call(
                 [str(config / "engram_mcp_wrapper.ps1")], 64, "", "invalid project resolution"
             )
         return subprocess.run(
-            [sys.executable, str(provider), "mcp", "--tools=agent", f"--project={canonical}"],
+            [sys.executable, str(provider), "mcp", "--tools=mem_current_project,mem_context,mem_search,mem_get_observation,mem_save,mem_session_summary", f"--project={canonical}"],
             cwd=workspace,
             env=environment,
             input=messages,

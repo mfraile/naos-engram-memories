@@ -1022,6 +1022,86 @@ class ProviderLifecycleTests(unittest.TestCase):
             self.assertIn("ENGRAM_DATA_DIR", completed.stderr)
             self.assertFalse(calls.exists())
 
+    def test_managed_data_dir_declaration_is_accepted_when_it_names_the_managed_store(self) -> None:
+        # NAOS governance declares data_dir: ~/.engram and documents ENGRAM_DATA_DIR
+        # as a runtime override, so restating the managed store must not be refused.
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            candidate = root / "engram"
+            candidate.write_bytes(provider_script("1.20.0"))
+            candidate.chmod(0o755)
+            support = memory.load_json(memory.bundled_config_path("release-support.json"))
+            managed = provider.managed_data_dir(root)
+            self.assertEqual(root / ".engram", managed)
+            for declared in (str(managed), f"{managed}/", f"{managed}//"):
+                with self.subTest(declared=declared):
+                    with mock.patch.dict(os.environ, {"ENGRAM_DATA_DIR": declared}, clear=False):
+                        result = provider.adopt_existing_provider(
+                            support, candidate=candidate, home=root,
+                            selected_platform=PLATFORM, yes=True, dry_run=True,
+                        )
+                    self.assertEqual("dry_run", result["status"])
+
+    def test_managed_data_dir_declaration_refuses_a_different_store(self) -> None:
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            candidate = root / "engram"
+            candidate.write_bytes(provider_script("1.20.0"))
+            candidate.chmod(0o755)
+            support = memory.load_json(memory.bundled_config_path("release-support.json"))
+            for declared in (str(root / "custom"), str(root / ".engram-alt"), "/tmp/engram-elsewhere"):
+                with self.subTest(declared=declared):
+                    with mock.patch.dict(os.environ, {"ENGRAM_DATA_DIR": declared}, clear=False):
+                        with self.assertRaisesRegex(provider.ProviderError, "different store"):
+                            provider.adopt_existing_provider(
+                                support, candidate=candidate, home=root,
+                                selected_platform=PLATFORM, yes=True, dry_run=True,
+                            )
+
+    def test_managed_data_dir_comparison_is_lexical_not_symlink_resolving(self) -> None:
+        # Resolving symlinks to force a match would accept a path the managed
+        # symlink policy refuses, so an aliased spelling must still be refused.
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            real = root / ".engram"
+            real.mkdir()
+            alias = root / "engram-alias"
+            try:
+                alias.symlink_to(real, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks unavailable")
+            candidate = root / "engram"
+            candidate.write_bytes(provider_script("1.20.0"))
+            candidate.chmod(0o755)
+            support = memory.load_json(memory.bundled_config_path("release-support.json"))
+            with mock.patch.dict(os.environ, {"ENGRAM_DATA_DIR": str(alias)}, clear=False):
+                with self.assertRaisesRegex(provider.ProviderError, "different store"):
+                    provider.adopt_existing_provider(
+                        support, candidate=candidate, home=root,
+                        selected_platform=PLATFORM, yes=True, dry_run=True,
+                    )
+
+    @unittest.skipIf(os.name == "nt", "POSIX wrapper fixture")
+    def test_managed_wrapper_accepts_a_declaration_of_the_managed_store(self) -> None:
+        from tools import engram_memory as memory_module
+
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            home, workspace, config_dir, bin_dir, wrapper = self._managed_wrapper_fixture(root)
+            calls = root / "provider-calls"
+            binary = bin_dir / "engram"
+            binary.write_text(f"#!/bin/sh\nprintf called > {json.dumps(str(calls))}\n")
+            binary.chmod(0o755)
+            self._record_managed_provider(home=home, config_dir=config_dir, binary=binary)
+            completed = __import__("subprocess").run(
+                [str(wrapper)], cwd=workspace,
+                env={**os.environ, "HOME": str(home), "ENGRAM_DATA_DIR": str(home / ".engram")},
+                text=True, stdout=__import__("subprocess").PIPE,
+                stderr=__import__("subprocess").PIPE, check=False,
+            )
+            self.assertEqual(0, completed.returncode, completed.stderr)
+            self.assertTrue(calls.exists(), "provider must start when the declaration agrees")
+
     def test_provider_state_uses_platform_config_directory(self) -> None:
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)
