@@ -1,3 +1,12 @@
+# Normalize all text to LF in the repository and on checkout. Several shell
+# scripts (scripts/setup.sh, scripts/engram-memory,
+# tools/validate_cross_os_interop.sh) previously relied on the platform default
+# and broke under a CRLF checkout with "set: pipefail: invalid option name".
+* text=auto eol=lf
+
+# Binary-safe and byte-exact assets stay explicit: these are covered by the
+# SHA-256 manifest in config/bootstrap-assets.v1.json, so their bytes must not
+# vary by platform.
 docs/evidence/*.json text eol=lf
 scripts/bootstrap.py text eol=lf
 scripts/bootstrap.sh text eol=lf

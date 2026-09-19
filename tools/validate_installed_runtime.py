@@ -260,6 +260,51 @@ def source_identity(source: Path, *, expected_commit: str | None = None, expecte
     }
 
 
+MINIMUM_OFFLINE_BUILD_BACKEND = (70, 1)
+
+
+def toolkit_version(source: Path) -> str:
+    """Read the packaged version from pyproject so evidence cannot drift."""
+    for line in (source / "pyproject.toml").read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if stripped.startswith("version"):
+            _, _, raw = stripped.partition("=")
+            return raw.strip().strip('"').strip("'")
+    raise RuntimeValidationError("pyproject.toml does not declare a version")
+
+
+def assert_offline_build_backend() -> None:
+    """Fail early and legibly when the ambient build backend cannot build offline.
+
+    This lane builds with ``--no-build-isolation`` and ``PIP_NO_INDEX``, so it
+    uses whatever setuptools is already importable. Some distribution-patched
+    setuptools releases (notably the 68.x shipped by Debian and Ubuntu) cannot
+    run ``bdist_wheel`` at all, which previously surfaced as a long, opaque pip
+    traceback instead of an actionable prerequisite.
+    """
+    try:
+        import setuptools  # noqa: PLC0415 - probed deliberately at call time
+    except ModuleNotFoundError as exc:  # pragma: no cover - defensive
+        raise RuntimeValidationError(
+            "offline wheel build requires setuptools in the current interpreter; "
+            f"install it with '{sys.executable} -m pip install \"setuptools>=70.1\"'"
+        ) from exc
+    raw = str(getattr(setuptools, "__version__", "0"))
+    parts: list[int] = []
+    for component in raw.split(".")[:2]:
+        digits = "".join(character for character in component if character.isdigit())
+        parts.append(int(digits) if digits else 0)
+    while len(parts) < 2:
+        parts.append(0)
+    if tuple(parts) < MINIMUM_OFFLINE_BUILD_BACKEND:
+        raise RuntimeValidationError(
+            f"offline wheel build needs setuptools >= 70.1 but found {raw}; distribution-patched "
+            "setuptools 68.x cannot build a wheel with --no-build-isolation. Install a supported "
+            f"backend first with '{sys.executable} -m pip install \"setuptools>=70.1\"' "
+            "(continuous integration pins setuptools==80.9.0)"
+        )
+
+
 def run_probe(
     source: Path,
     engram_binary: Path,
@@ -300,6 +345,7 @@ def run_probe(
             assets[0]["status"] = "supported"
             support_path.write_text(json.dumps(support, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         wheelhouse.mkdir()
+        assert_offline_build_backend()
         environment = os.environ.copy()
         environment["PIP_NO_INDEX"] = "1"
         environment["PIP_CACHE_DIR"] = str(root / "pip-cache")
@@ -496,7 +542,7 @@ def run_probe(
             "synthetic_only": True,
             "platform": {"system": platform.system(), "architecture": platform.machine()},
             "python": platform.python_version(),
-            "toolkit_version": "1.0.0",
+            "toolkit_version": toolkit_version(source),
             "engram_version": version,
             "engram_binary_sha256": sha256(engram_binary),
             "network_accessed": None,

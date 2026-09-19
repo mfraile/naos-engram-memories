@@ -1,19 +1,21 @@
 # Fail-closed stdio wrapper for registered Engram projects on Windows.
 $ErrorActionPreference = 'Stop'
+# Declared before the first guard: Write-Error is terminating under
+# $ErrorActionPreference = 'Stop', which made the explicit exit codes below
+# unreachable and reported 1 instead of the documented 64/75/127.
+function Write-WrapperLog([string]$Message) { [Console]::Error.WriteLine("[$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))] $Message") }
+function Stop-Wrapper([string]$Message, [int]$Code) { Write-WrapperLog $Message; exit $Code }
 if ($env:ENGRAM_CLOUD_AUTOSYNC -or $env:ENGRAM_CLOUD_SERVER -or $env:ENGRAM_CLOUD_TOKEN -or $env:ENGRAM_REMOTE_URL -or $env:ENGRAM_TOKEN -or $env:ENGRAM_DATABASE_URL -or $env:ENGRAM_JWT_SECRET) {
-    Write-Error 'Cloud/autosync environment is unsupported by this locked local-only wrapper.'
-    exit 64
+    Stop-Wrapper 'ERROR cloud/autosync environment is unsupported by this locked local-only wrapper' 64
 }
 $defaultConfigDir = if ($env:APPDATA) { Join-Path $env:APPDATA 'naos-engram-memory' } else { Join-Path $HOME '.config\naos-engram-memory' }
 $legacyConfigDir = if ($env:APPDATA) { Join-Path $env:APPDATA 'engram-memory' } else { Join-Path $HOME '.config\engram-memory' }
 $legacyNames = @('ENGRAM_MEMORY_CONFIG_DIR', 'ENGRAM_MEMORY_TOOL', 'ENGRAM_MEMORY_REGISTRY', 'ENGRAM_MEMORY_LOG', 'ENGRAM_MEMORY_PYTHON', 'NAOS_ENGRAM_MEMORY_CONFIG_DIR', 'NAOS_ENGRAM_MEMORY_TOOL', 'NAOS_ENGRAM_MEMORY_REGISTRY', 'NAOS_ENGRAM_MEMORY_LOG', 'NAOS_ENGRAM_MEMORY_PYTHON')
 if ($legacyNames | Where-Object { [Environment]::GetEnvironmentVariable($_) }) {
-    Write-Error 'Toolkit path overrides are not accepted by the installed MCP wrapper.'
-    exit 64
+    Stop-Wrapper 'ERROR toolkit path overrides are not accepted by the installed MCP wrapper' 64
 }
 if ($env:ENGRAM_DATA_DIR) {
-    Write-Error 'Custom ENGRAM_DATA_DIR is unsupported by the managed wrapper in this release.'
-    exit 64
+    Stop-Wrapper 'ERROR custom ENGRAM_DATA_DIR is unsupported by the managed wrapper in this release' 64
 }
 $ConfigDir = __NAOS_ENGRAM_MEMORY_CONFIG_DIR__
 if ($ConfigDir -eq ('__NAOS' + '_ENGRAM_MEMORY_CONFIG_DIR__')) { $ConfigDir = $defaultConfigDir }
@@ -33,8 +35,6 @@ function Assert-NoReparsePoint([string]$Path) {
         }
     }
 }
-function Write-WrapperLog([string]$Message) { [Console]::Error.WriteLine("[$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))] $Message") }
-function Stop-Wrapper([string]$Message, [int]$Code) { Write-WrapperLog $Message; exit $Code }
 
 $PythonExecutable = __PYTHON_EXECUTABLE__
 if ($PythonExecutable -eq ('__PYTHON' + '_EXECUTABLE__')) { Stop-Wrapper 'ERROR configured Python 3.10+ interpreter is unavailable' 64 }
@@ -68,7 +68,7 @@ if ($env:ENGRAM_BIN) { $EngramBin = $env:ENGRAM_BIN } elseif (Test-Path -Literal
     $EngramBin = if ($engram) { $engram.Source } else { Join-Path $HOME 'bin\engram.exe' }
 }
 Assert-NoReparsePoint $EngramBin
-if (-not (Test-Path $EngramBin)) { Stop-Wrapper 'ERROR Engram binary is not installed or executable' 127 }
+if (-not (Test-Path -LiteralPath $EngramBin)) { Stop-Wrapper 'ERROR Engram binary is not installed or executable' 127 }
 $maintenancePresent = (Test-Path -LiteralPath $MaintenanceLock) -or ([System.IO.File]::Exists($MaintenanceLock))
 if ($maintenancePresent) { Stop-Wrapper 'ERROR provider maintenance is active or requires manual lock review' 75 }
 if (-not (Test-Path -LiteralPath $ClientLeaseRoot)) {
