@@ -17,6 +17,22 @@ Managed configuration writes reject symbolic links in workspace and runtime
 targets. They allocate unpredictable same-directory temporary files
 exclusively and atomically replace the reviewed target only after rendering.
 
+The refusal covers **every component** of a path, from the filesystem anchor
+down, not just the final entry. Two environments therefore need an explicit
+adjustment before the runtime can be installed:
+
+| Situation | Remediation |
+| --- | --- |
+| `$HOME` is itself a symbolic link | Rerun with `HOME` set to its resolved physical path: `HOME="$(cd "$HOME" && pwd -P)"` |
+| `$HOME` is real but the configuration directory is a symbolic link | Set `NAOS_ENGRAM_MEMORY_CONFIG_DIR` to a path whose every component is real |
+
+`NAOS_ENGRAM_MEMORY_CONFIG_DIR` does **not** substitute for the first case: the
+home-directory check runs independently of the configured directory, so a
+symlinked `$HOME` is refused regardless. The only exception built into the check
+is Darwin's root-owned `/var` → `/private/var` compatibility alias, which is
+required for ordinary temporary paths and is outside every caller-controlled
+directory. Both refusals now state their remediation in the error message.
+
 ## Profiles
 
 - Use `local` unless a shared use case has an approved owner and data policy.

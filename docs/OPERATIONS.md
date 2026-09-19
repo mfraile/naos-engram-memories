@@ -1,5 +1,16 @@
 # Operations and Recovery
 
+## Validation prerequisites
+
+The unit suite and `tools/validate_installed_runtime.py` build a wheel offline
+with `--no-build-isolation`, so they use the ambient `setuptools`.
+`setuptools>=70.1` is required; the 68.x shipped by Debian and Ubuntu cannot run
+`bdist_wheel` in that mode and fails for every project, not only this one. The
+validator now pre-checks this and names the remediation instead of surfacing a
+pip traceback. Continuous integration pins `setuptools==80.9.0`.
+
+The suite must pass on the whole declared `requires-python` range (3.10 to 3.13).
+
 ## Normal operation
 
 The managed wrapper invokes `engram mcp --tools=agent`, so the exposed MCP
