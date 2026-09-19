@@ -13,11 +13,25 @@ The suite must pass on the whole declared `requires-python` range (3.10 to 3.13)
 
 ## Normal operation
 
-The managed wrapper invokes `engram mcp --tools=agent`, so the exposed MCP
-surface is the agent profile rather than the provider's administrative
-delete/merge profile. It refuses non-empty cloud autosync/server/token, legacy
-remote URL/token, database URL, JWT secret, and custom data-directory overrides
-before provider startup. This release does not authorize cloud synchronization.
+The managed wrapper starts the provider with an explicit six-tool allowlist —
+`mem_current_project`, `mem_context`, `mem_search`, `mem_get_observation`,
+`mem_save`, `mem_session_summary` — rather than the `agent` profile name. Those
+six are the intersection of the provider's agent profile with the vocabulary NAOS
+governance recognises, so the surface is fixed here instead of following a
+profile whose membership changes between provider releases. Administrative
+delete/merge tools are excluded, and so is cross-project enumeration
+(`mem_list_projects`, which upstream added to the agent profile after v1.20.0).
+
+It refuses non-empty cloud autosync/server/token, legacy remote URL/token,
+database URL, and JWT secret variables before provider startup.
+`ENGRAM_DATA_DIR` is accepted only when it names the managed store `~/.engram`
+and refused with exit 64 otherwise. This release does not authorize cloud
+synchronization.
+
+Note for auditors: the allowlist lives in the wrapper's own invocation, so NAOS
+governance cannot observe it. Its capability contract prohibits reading command
+arguments, which means `mcp_tools_declared` stays empty for these adapters. The
+restriction is a runtime control, not a declaration governance can verify.
 
 Run clients concurrently only for normal local reads/writes. SQLite WAL and
 the Engram retry policy do not make upgrades, migrations, repair, import, or

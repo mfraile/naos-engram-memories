@@ -33,6 +33,35 @@ is Darwin's root-owned `/var` → `/private/var` compatibility alias, which is
 required for ordinary temporary paths and is outside every caller-controlled
 directory. Both refusals now state their remediation in the error message.
 
+## Memory store location
+
+This release manages exactly one store: `~/.engram` (`%USERPROFILE%\.engram` on
+Windows), with the database derived as `<store>/engram.db`. That is also the path
+NAOS governance declares as `data_dir` in `configs/naos_memory.yaml`.
+
+`ENGRAM_DATA_DIR` is therefore handled by agreement, not by blanket refusal:
+
+| Value | Result |
+| --- | --- |
+| unset | the managed store is used |
+| resolves to the managed store (including `~/.engram` or a trailing slash) | accepted |
+| names any other directory | refused, exit 64, naming the expected path |
+
+Governance documents the variable as a runtime override, so a caller that merely
+restates the managed store previously failed for agreeing with the toolkit. Only a
+*different* store is refused, and the reason is narrow: maintenance backs up and
+probes the database before replacing a binary, and it must never operate on a
+database Engram does not open. Because the effective store cannot vary, that
+invariant holds by construction rather than by forbidding the variable.
+
+The comparison is lexical on the normalized absolute path. Resolving symbolic
+links to force a match would accept a path the managed symlink policy refuses, so
+an aliased spelling of the same directory is still refused.
+
+A genuinely custom store is out of scope for this release. Supporting one would
+require recording the declared directory in durable toolkit state and deriving the
+maintenance database and backup root from that same record.
+
 ## Profiles
 
 - Use `local` unless a shared use case has an approved owner and data policy.
@@ -84,11 +113,13 @@ Any path retargeting or byte change is refused. Adopted binaries remain owned
 by their external installer and cannot be upgraded or rolled back by this
 toolkit; upgrade externally and re-adopt.
 
-This release supports only the provider's default `~/.engram` data directory.
-Any non-empty `ENGRAM_DATA_DIR` causes adoption, provider mutation, and managed
-wrapper startup to fail before download, state change, binary change, database
-backup, or provider spawn. Custom stores require a future independently tested
-profile that resolves, probes, and backs up the same explicit location.
+This release supports only the provider's default `~/.engram` data directory, and
+`ENGRAM_DATA_DIR` is accepted only when it names that same store — see
+[Memory store location](#memory-store-location). A value naming any other
+directory causes adoption, provider mutation, and managed wrapper startup to fail
+before download, state change, binary change, database backup, or provider spawn.
+Custom stores require a future independently tested profile that resolves, probes,
+and backs up the same explicit location.
 
 Provider mutation acquires an exclusive per-user maintenance lock before its
 activity probes and retains it through backup, download, verification, binary

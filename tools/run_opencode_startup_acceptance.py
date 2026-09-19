@@ -371,7 +371,7 @@ def evaluate_startup_trace(
             and "connected" in host_output.casefold(),
             "wrapper_argv_exact": len(spawn_events) == 1
             and spawn_events[0].get("argv")
-            == ["mcp", "--tools=agent", "--project=example-product"],
+            == ["mcp", "--tools=mem_current_project,mem_context,mem_search,mem_get_observation,mem_save,mem_session_summary", "--project=example-product"],
             "provider_environment_isolated": provider_environment_isolated,
             "unexpected_environment_variables": unexpected_environment,
             "expected_methods_observed": methods == list(EXPECTED_METHODS),

@@ -17,7 +17,7 @@ class OpenCodeStartupAcceptanceTests(unittest.TestCase):
         return [
             {
                 "event": "spawn",
-                "argv": ["mcp", "--tools=agent", "--project=example-product"],
+                "argv": ["mcp", "--tools=mem_current_project,mem_context,mem_search,mem_get_observation,mem_save,mem_session_summary", "--project=example-product"],
                 "environment": {
                     "HOME": str(home),
                     "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",

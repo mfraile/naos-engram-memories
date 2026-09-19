@@ -6,7 +6,7 @@
     "bootstrap.py": "eed8e154224eee8f1be1403c1d60d687b95801bdb53944b0848a89a6bc2c69b0",
     "bootstrap.sh": "952cad6999e512ef7b0bb79c92692654a88acbaa79333ce263f71a2ebb24ceb5",
     "bootstrap.ps1": "fecd60874560dd5ee5bbf7bd763e562397075b81e0b415e2b45eea57f7b788cd",
-    "engram_mcp_wrapper.sh": "1e668bdfdfee968adaebc01400cecdb1b88ea485c86b0b0bc6a33dd9b084b86c",
-    "engram_mcp_wrapper.ps1": "4fe69b16af58777d2ed38fba727fa4a8d9c85d00422b0737a0e76ec91b0ec27c"
+    "engram_mcp_wrapper.sh": "4634411fee3edb81c709ee826fd1386725cda0f38a317a3634b29b26785d6e1e",
+    "engram_mcp_wrapper.ps1": "7267fe5358d8f71ed91bda2f2ea51f7d1c018213b92b194372d3d75b187d0bed"
   }
 }
