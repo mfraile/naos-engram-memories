@@ -1,0 +1,33 @@
+{
+  "asset": "engram_1.20.0_darwin_amd64.tar.gz",
+  "asset_sha256": "3b9015dcfcdd9f823eb7ad0b590b1dbc4c25bb5d81dda3f84e623709815afe80",
+  "asset_sha256_matches_upstream_checksums_txt": true,
+  "disposition": "asset_identity_verified_platform_not_promoted",
+  "engram_version": "1.20.0",
+  "executed_at": "2026-09-19T23:28:36.216222+00:00",
+  "executed_on": {
+    "architecture": "x86_64",
+    "system": "Linux"
+  },
+  "extracted_binary_name": "engram",
+  "extracted_binary_sha256": "51bb4307fa2ca74a46ec01047c9cf54d59cc9e9666255e8d5bb39e51b1ad3542",
+  "extraction_rules": "tools/provider.py _extract_binary: exactly one member named engram/engram.exe; absolute paths, parent traversal, symlink and hardlink members refused",
+  "not_verified": [
+    "The binary was NOT executed: this validator ran on Linux/x86_64, not on darwin_amd64.",
+    "No MCP stdio initialize, tools/list or mem_current_project round trip was performed on this platform.",
+    "No managed wrapper, runtime install, or fail-closed project-identity check was exercised on this platform.",
+    "This is therefore NOT a promotion receipt and does not satisfy the installed-runtime gate."
+  ],
+  "platform_key": "darwin_amd64",
+  "promotion_requirement": "Run tools/validate_installed_runtime.py --engram-binary <path> on real darwin_amd64 hardware, commit that receipt, then flip status to supported in config/release-support.json.",
+  "schema_version": 1,
+  "scope": "release_asset_identity_only",
+  "source_commit": "5916a501219dba705f5d926b506afacf41756a7d",
+  "source_worktree_dirty": true,
+  "upstream_checksums_source": "https://github.com/Gentleman-Programming/engram/releases/download/v1.20.0/checksums.txt",
+  "verified": [
+    "The published archive SHA-256 matches upstream's checksums.txt for v1.20.0.",
+    "The archive contains exactly one member named engram and no unsafe or linked member.",
+    "The extracted binary's SHA-256 is recorded for future comparison."
+  ]
+}

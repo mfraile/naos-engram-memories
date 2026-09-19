@@ -1,0 +1,33 @@
+{
+  "asset": "engram_1.20.0_windows_arm64.zip",
+  "asset_sha256": "eb93c6d7d5a4020ddcf1ff956909f3e90694f6447519433316b10f964f8f37b5",
+  "asset_sha256_matches_upstream_checksums_txt": true,
+  "disposition": "asset_identity_verified_platform_not_promoted",
+  "engram_version": "1.20.0",
+  "executed_at": "2026-09-19T23:28:36.589942+00:00",
+  "executed_on": {
+    "architecture": "x86_64",
+    "system": "Linux"
+  },
+  "extracted_binary_name": "engram.exe",
+  "extracted_binary_sha256": "a7fe2d131c1dc3a34406909544b0f203d865329867fd33ff1c0b8b9d72193a61",
+  "extraction_rules": "tools/provider.py _extract_binary: exactly one member named engram/engram.exe; absolute paths, parent traversal, symlink and hardlink members refused",
+  "not_verified": [
+    "The binary was NOT executed: this validator ran on Linux/x86_64, not on windows_arm64.",
+    "No MCP stdio initialize, tools/list or mem_current_project round trip was performed on this platform.",
+    "No managed wrapper, runtime install, or fail-closed project-identity check was exercised on this platform.",
+    "This is therefore NOT a promotion receipt and does not satisfy the installed-runtime gate."
+  ],
+  "platform_key": "windows_arm64",
+  "promotion_requirement": "Run tools/validate_installed_runtime.py --engram-binary <path> on real windows_arm64 hardware, commit that receipt, then flip status to supported in config/release-support.json.",
+  "schema_version": 1,
+  "scope": "release_asset_identity_only",
+  "source_commit": "5916a501219dba705f5d926b506afacf41756a7d",
+  "source_worktree_dirty": true,
+  "upstream_checksums_source": "https://github.com/Gentleman-Programming/engram/releases/download/v1.20.0/checksums.txt",
+  "verified": [
+    "The published archive SHA-256 matches upstream's checksums.txt for v1.20.0.",
+    "The archive contains exactly one member named engram.exe and no unsafe or linked member.",
+    "The extracted binary's SHA-256 is recorded for future comparison."
+  ]
+}

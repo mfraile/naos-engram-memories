@@ -32,7 +32,11 @@
         "darwin_amd64": {
           "status": "experimental",
           "asset": "engram_1.20.0_darwin_amd64.tar.gz",
-          "sha256": null
+          "sha256": "3b9015dcfcdd9f823eb7ad0b590b1dbc4c25bb5d81dda3f84e623709815afe80",
+          "evidence": "Release asset identity verified against upstream checksums.txt for v1.20.0: the archive SHA-256 matches and it contains exactly one safe engram member under the managed extraction rules. Promotion additionally requires an installed-runtime validation on this platform's hardware; see docs/evidence/v1.20.0-asset-identity-darwin-amd64.json.",
+          "promotion_blocked_on": [
+            "no installed-runtime validation has been executed on this platform's hardware"
+          ]
         },
         "linux_amd64": {
           "status": "supported",
@@ -51,17 +55,41 @@
             "residual_gaps": [
               "The validation run was taken from a dirty worktree, so it is not a clean-tree attestation and is not reproducible from the published history.",
               "Only ASCII MCP payloads were exercised; a non-ASCII stdio round trip through powershell.exe is unvalidated. See docs/evidence/README.md.",
-              "Windows ARM64 is a separate platform key (windows_arm64) with no allowlisted asset and is refused."
+              "Windows ARM64 is a separate platform key (windows_arm64). Its asset checksum is now pinned, but it remains experimental and refused for toolkit install until an installed-runtime validation runs on ARM64 Windows hardware."
             ]
           }
+        },
+        "linux_arm64": {
+          "status": "experimental",
+          "asset": "engram_1.20.0_linux_arm64.tar.gz",
+          "sha256": "7eb815910a76ae6cfa9a5d0161d3701e293dcca71f7743cffa62e236e5af59af",
+          "evidence": "Release asset identity verified against upstream checksums.txt for v1.20.0: the archive SHA-256 matches and it contains exactly one safe engram member under the managed extraction rules. Promotion additionally requires an installed-runtime validation on this platform's hardware; see docs/evidence/v1.20.0-asset-identity-linux-arm64.json.",
+          "promotion_blocked_on": [
+            "no installed-runtime validation has been executed on this platform's hardware"
+          ]
+        },
+        "windows_arm64": {
+          "status": "experimental",
+          "asset": "engram_1.20.0_windows_arm64.zip",
+          "sha256": "eb93c6d7d5a4020ddcf1ff956909f3e90694f6447519433316b10f964f8f37b5",
+          "evidence": "Release asset identity verified against upstream checksums.txt for v1.20.0: the archive SHA-256 matches and it contains exactly one safe engram.exe member under the managed extraction rules. Promotion additionally requires an installed-runtime validation on this platform's hardware; see docs/evidence/v1.20.0-asset-identity-windows-arm64.json.",
+          "promotion_blocked_on": [
+            "no installed-runtime validation has been executed on this platform's hardware"
+          ]
         }
+      },
+      "checksum_provenance": {
+        "source": "https://github.com/Gentleman-Programming/engram/releases/download/v1.20.0/checksums.txt",
+        "verified_on": "2026-09-19",
+        "result": "every pinned platform SHA-256 in this release matches upstream checksums.txt exactly, including the three platforms promoted before this check"
       }
     },
     {
       "version": "2.0.0",
       "status": "unreviewed",
-      "reason": "Major-version review is pending for canonical project resolution, project-scoped reads, MCP/session attribution, database upgrade and rollback behavior, optional cloud environment refusal, and all supported platform assets.",
-      "release_url": "https://github.com/Gentleman-Programming/engram/releases/tag/v2.0.0"
+      "reason": "Major-version review is pending for canonical project resolution, project-scoped reads, MCP/session attribution, database upgrade and rollback behavior, optional cloud environment refusal, and all supported platform assets. Review must also cover the MCP agent tool profile: upstream added mem_list_projects (cross-project enumeration) to the agent profile after v1.20.0, which widens the tool surface this toolkit's project-isolation protocol forbids.",
+      "release_url": "https://github.com/Gentleman-Programming/engram/releases/tag/v2.0.0",
+      "status_note": "No v2.0.0 final release exists yet; upstream has published v2.0.0-rc.1 through v2.0.0-rc.12. Upstream's own release policy states release candidates are not universally suitable for production and carry no guaranteed security support."
     }
   ]
 }
